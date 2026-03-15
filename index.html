@@ -3,259 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>💣 Mines</title>
+<title>💣 Mines Game</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0a14;--sur:rgba(255,255,255,.045);--bdr:rgba(255,255,255,.08);
-  --acc:#f59e0b;--grn:#10b981;--red:#ef4444;--blu:#3b82f6;
-  --tx:#e8e8f0;--dim:rgba(255,255,255,.38);
-}
+:root{--bg:#0a0a14;--sur:rgba(255,255,255,.05);--bdr:rgba(255,255,255,.09);--acc:#f59e0b;--grn:#10b981;--red:#ef4444;--tx:#e8e8f0;--dim:rgba(255,255,255,.4);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--tx);}
-
-/* Animated background */
 .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-.orb{position:absolute;border-radius:50%;}
-.orb1{width:500px;height:500px;top:-150px;left:-100px;
-  background:radial-gradient(circle,rgba(245,159,11,.11),transparent 70%);
-  animation:drift1 22s ease-in-out infinite alternate;}
-.orb2{width:400px;height:400px;bottom:-120px;right:-80px;
-  background:radial-gradient(circle,rgba(16,185,129,.08),transparent 70%);
-  animation:drift2 18s ease-in-out infinite alternate;}
-.grid-bg{position:absolute;inset:0;
-  background:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
-             linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
-  background-size:36px 36px;}
-@keyframes drift1{to{transform:translate(60px,40px) scale(1.1)}}
-@keyframes drift2{to{transform:translate(-50px,-30px) scale(1.12)}}
-
-/* Loader */
-#ldr{position:fixed;inset:0;background:var(--bg);z-index:999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .3s;}
+.orb1{position:absolute;width:500px;height:500px;border-radius:50%;top:-150px;left:-100px;background:radial-gradient(circle,rgba(245,159,11,.12),transparent 70%);animation:d1 22s ease-in-out infinite alternate;}
+.orb2{position:absolute;width:400px;height:400px;border-radius:50%;bottom:-120px;right:-80px;background:radial-gradient(circle,rgba(239,68,68,.08),transparent 70%);animation:d2 18s ease-in-out infinite alternate;}
+@keyframes d1{to{transform:translate(60px,40px)}} @keyframes d2{to{transform:translate(-50px,-30px)}}
+#ldr{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;}
 .ldr-icon{font-size:3.5rem;animation:pulse 1.2s ease-in-out infinite alternate;}
 @keyframes pulse{to{transform:scale(1.15)}}
-.ldr-title{font-size:1.9rem;font-weight:900;
-  background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.spin{width:30px;height:30px;border:3px solid rgba(255,255,255,.1);
-  border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;}
+.ldr-title{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.spin{width:28px;height:28px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* App */
 #app{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:12px 13px 48px;display:none;}
-
-/* Card */
 .card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;backdrop-filter:blur(16px);padding:16px;}
 .mb10{margin-bottom:10px;}
-
-/* Header */
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.logo{font-size:1.2rem;font-weight:900;
-  background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo{font-size:1.2rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .icon-btn{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:9px;cursor:pointer;display:flex;transition:.15s;}
 .icon-btn:active{transform:scale(.9);}
-
-/* Balance */
-.bal-card{background:linear-gradient(135deg,rgba(245,159,11,.14),rgba(239,68,68,.09));
-  border:1px solid rgba(245,159,11,.22);border-radius:18px;padding:18px;margin-bottom:10px;position:relative;overflow:hidden;}
+.bal-card{background:linear-gradient(135deg,rgba(245,159,11,.15),rgba(239,68,68,.1));border:1px solid rgba(245,159,11,.24);border-radius:18px;padding:18px;margin-bottom:10px;position:relative;overflow:hidden;}
 .bal-card::after{content:'💣';position:absolute;right:14px;top:10px;font-size:3.5rem;opacity:.12;pointer-events:none;}
-.bal-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-.bal-num{font-size:2.8rem;font-weight:900;letter-spacing:-.02em;line-height:1;
-  background:linear-gradient(135deg,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bal-lbl{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.bal-num{font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .bal-sub{font-size:12px;color:var(--dim);margin-top:2px;}
-.bal-actions{display:flex;gap:8px;margin-top:12px;}
-.bal-btn{flex:1;padding:9px;border-radius:10px;border:none;font-family:'Outfit',sans-serif;
-  font-weight:700;font-size:12px;cursor:pointer;transition:.14s;}
-.bal-btn:active{transform:scale(.95);}
+.bal-acts{display:flex;gap:8px;margin-top:12px;}
+.bal-btn{flex:1;padding:9px;border-radius:10px;border:none;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:.14s;}
 .dep-btn{background:rgba(16,185,129,.18);color:#6ee7b7;border:1px solid rgba(16,185,129,.3);}
-.wd-btn{background:rgba(245,184,0,.14);color:#fde68a;border:1px solid rgba(245,184,0,.28);}
-
-/* Stats */
+.wd-btn{background:rgba(245,184,0,.15);color:#fde68a;border:1px solid rgba(245,184,0,.3);}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
 .stat{background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:11px 7px;text-align:center;}
-.sv{font-size:1.3rem;font-weight:900;line-height:1;}
-.sl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;margin-top:3px;}
-
-/* Buttons */
-.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:13px;
-  font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;border:none;
-  border-radius:13px;color:#fff;cursor:pointer;transition:all .15s;}
+.sv{font-size:1.3rem;font-weight:900;}.sl{font-size:9px;color:var(--dim);text-transform:uppercase;margin-top:3px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:14px;font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;border:none;border-radius:13px;color:#fff;cursor:pointer;transition:all .15s;}
 .btn:active{transform:scale(.96);}
-.btn-play{background:linear-gradient(135deg,#d97706,#ef4444);box-shadow:0 6px 22px rgba(239,100,0,.3);font-size:1.05rem;padding:16px;}
+.btn-play{background:linear-gradient(135deg,#d97706,#ef4444);box-shadow:0 6px 22px rgba(239,100,0,.3);}
 .btn-grn{background:linear-gradient(135deg,#059669,#10b981);}
 .btn-ylw{background:linear-gradient(135deg,#b45309,#f59e0b);}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px;}
-
-/* Panel accordion */
-.panel{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s,margin .3s;pointer-events:none;}
-.panel.open{max-height:800px;opacity:1;margin-top:9px;pointer-events:auto;}
-
-/* Input */
-.inp-lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
-.inp{width:100%;padding:11px 13px;background:rgba(0,0,0,.25);border:1.5px solid var(--bdr);
-  border-radius:11px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:.2s;}
-.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(245,159,11,.14);}
-.inp::placeholder{color:rgba(255,255,255,.18);}
+.collapse-btn{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:12px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;transition:.15s;}
+.panel{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s;pointer-events:none;}
+.panel.open{max-height:700px;opacity:1;margin-bottom:10px;pointer-events:auto;}
+.lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.inp{width:100%;padding:11px 13px;background:rgba(0,0,0,.25);border:1.5px solid var(--bdr);border-radius:11px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:.2s;}
+.inp:focus{border-color:var(--acc);}
+.inp::placeholder{color:rgba(255,255,255,.2);}
 .gap{display:flex;flex-direction:column;gap:9px;}
-
-/* KPay box */
-.kbox{background:rgba(0,0,0,.2);border:1px solid rgba(245,184,0,.18);border-radius:12px;padding:12px;margin-bottom:9px;}
-.krow{display:flex;justify-content:space-between;align-items:center;
-  background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:6px;}
+.kbox{background:rgba(0,0,0,.2);border:1px solid rgba(245,184,0,.2);border-radius:12px;padding:12px;margin-bottom:9px;}
+.krow{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:6px;}
 .knum{font-family:monospace;font-size:1.1rem;font-weight:700;letter-spacing:.05em;}
-.copy-btn{background:rgba(245,184,0,.15);color:#fde68a;border:none;border-radius:7px;
-  padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:.13s;}
-.copy-btn:active{transform:scale(.9);}
-.method-row{display:flex;gap:7px;margin-bottom:9px;}
-.mth-btn{flex:1;padding:9px;border-radius:10px;border:2px solid transparent;font-family:'Outfit',sans-serif;
-  font-weight:700;font-size:12px;cursor:pointer;background:var(--sur);color:var(--dim);transition:.15s;}
-.mth-btn.sel{background:rgba(245,159,11,.2);border-color:var(--acc);color:#fcd34d;}
-
-/* Referral */
-.ref-code{background:rgba(0,0,0,.3);border:1.5px dashed rgba(245,184,0,.3);border-radius:11px;
-  padding:11px 13px;font-family:monospace;font-size:12px;font-weight:700;color:#fcd34d;word-break:break-all;}
-
-/* History */
-.hist-row{display:flex;justify-content:space-between;align-items:center;
-  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.copy-btn{background:rgba(245,184,0,.15);color:#fde68a;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;}
+.mth-row{display:flex;gap:7px;margin-bottom:9px;}
+.mth{flex:1;padding:9px;border-radius:10px;border:2px solid transparent;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;cursor:pointer;background:var(--sur);color:var(--dim);transition:.15s;}
+.mth.on{background:rgba(245,159,11,.2);border-color:var(--acc);color:#fcd34d;}
+.ref-code{background:rgba(0,0,0,.3);border:1.5px dashed rgba(245,184,0,.3);border-radius:11px;padding:11px 13px;font-family:monospace;font-size:12px;font-weight:700;color:#fcd34d;word-break:break-all;margin-bottom:9px;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
 .hist-row:last-child{border-bottom:none;}
 .hi-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.hi-win{background:rgba(16,185,129,.15);}
-.hi-lose{background:rgba(239,68,68,.15);}
-
-/* Toast */
-#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-70px);
-  z-index:9999;transition:all .36s cubic-bezier(.68,-.55,.265,1.55);opacity:0;pointer-events:none;}
+#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-70px);z-index:9999;transition:all .36s cubic-bezier(.68,-.55,.265,1.55);opacity:0;pointer-events:none;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-.toast-inner{padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;
-  backdrop-filter:blur(20px);display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.ti{padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;backdrop-filter:blur(20px);display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .t-ok{background:rgba(16,185,129,.9);border:1px solid #34d399;color:#fff;}
 .t-err{background:rgba(239,68,68,.9);border:1px solid #f87171;color:#fff;}
-
-/* Section header */
-.sec-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
-.sec-lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;}
-
-/* Collapsible row buttons */
-.collapse-btn{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);
-  border:1px solid var(--bdr);border-radius:12px;color:var(--tx);font-family:'Outfit',sans-serif;
-  font-size:13px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:.15s;}
-.collapse-btn:active{background:rgba(255,255,255,.1);}
 </style>
 </head>
 <body>
-<div class="bg"><div class="orb orb1"></div><div class="orb orb2"></div><div class="grid-bg"></div></div>
+<div class="bg"><div class="orb1"></div><div class="orb2"></div></div>
 <div id="ldr">
   <div class="ldr-icon">💣</div>
   <div class="ldr-title">Mines</div>
+  <div style="font-size:11px;color:var(--dim);margin-top:-8px;">ချိတ်ဆက်နေသည်...</div>
   <div class="spin"></div>
 </div>
-<div id="toast"><div class="toast-inner" id="toast-msg"></div></div>
+<div id="toast"><div class="ti" id="tmsg"></div></div>
 
 <div id="app">
-  <!-- Header -->
   <div class="hdr">
     <div class="logo">💣 Mines Game</div>
-    <button class="icon-btn" onclick="refreshBal()" title="Refresh">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline>
-        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
-      </svg>
+    <button class="icon-btn" onclick="refresh()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
     </button>
   </div>
 
-  <!-- Balance -->
   <div class="bal-card">
-    <div class="bal-label">💰 လက်ကျန်ငွေ</div>
+    <div class="bal-lbl">💰 လက်ကျန်ငွေ</div>
     <div class="bal-num" id="balNum">0</div>
     <div class="bal-sub">ကျပ် (MMK)</div>
-    <div class="bal-actions">
-      <button class="bal-btn dep-btn" onclick="togglePanel('dep')">＋ ဖြည့်မည်</button>
-      <button class="bal-btn wd-btn"  onclick="togglePanel('wd')">↑ ထုတ်မည်</button>
+    <div class="bal-acts">
+      <button class="bal-btn dep-btn" onclick="openPanel('dep')">＋ ငွေဖြည့်</button>
+      <button class="bal-btn wd-btn"  onclick="openPanel('wd')">↑ ငွေထုတ်</button>
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="stats">
-    <div class="stat"><div class="sv" id="st-games">0</div><div class="sl">ပွဲ</div></div>
-    <div class="stat"><div class="sv" id="st-won" style="color:var(--grn)">0</div><div class="sl">CashOut</div></div>
-    <div class="stat"><div class="sv" id="st-lost" style="color:var(--red)">0</div><div class="sl">ဗုံးထိ</div></div>
+    <div class="stat"><div class="sv" id="stGames">0</div><div class="sl">ပွဲ</div></div>
+    <div class="stat"><div class="sv" id="stWon" style="color:var(--grn)">0</div><div class="sl">Win</div></div>
+    <div class="stat"><div class="sv" id="stLost" style="color:var(--red)">0</div><div class="sl">Lose</div></div>
   </div>
 
-  <!-- PLAY -->
-  <button class="btn btn-play mb10" onclick="goPlay()">💣 Mines ကစားမည်</button>
+  <button class="btn btn-play mb10" onclick="goPlay()" style="font-size:1.1rem;padding:16px;">💣 Mines ကစားမည်</button>
 
-  <!-- ── Deposit Panel ── -->
-  <button class="collapse-btn mb10" onclick="togglePanel('dep')">
+  <!-- Deposit Panel -->
+  <button class="collapse-btn" onclick="togglePanel('dep')">
     <span>💳 ငွေဖြည့်ရန်</span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
   </button>
   <div class="panel" id="pDep">
     <div class="card">
       <div class="kbox">
-        <div id="payTag" style="display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;
-          background:rgba(245,159,11,.15);color:#fcd34d;border:1px solid rgba(245,159,11,.25);margin-bottom:8px;">📱 KPay</div>
+        <div id="payTag" style="display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(245,159,11,.15);color:#fcd34d;border:1px solid rgba(245,159,11,.25);margin-bottom:8px;">📱 KPay</div>
         <div class="krow">
-          <div><div style="font-size:10px;color:var(--dim);margin-bottom:2px;">KPay နံပါတ်</div>
-          <div class="knum" id="kpayNum">—</div></div>
-          <button class="copy-btn" onclick="copyNum('kpayNum')">Copy</button>
+          <div><div style="font-size:10px;color:var(--dim);margin-bottom:2px;">KPay နံပါတ်</div><div class="knum" id="kpayNum">—</div></div>
+          <button class="copy-btn" onclick="copyTxt('kpayNum')">Copy</button>
         </div>
         <div style="font-size:11px;color:var(--dim);">အမည်: <b id="kpayName">—</b></div>
       </div>
-      <div class="method-row">
-        <button class="mth-btn sel" id="mKpay" onclick="setMethod('kpay')">📱 KPay</button>
-        <button class="mth-btn" id="mWave" onclick="setMethod('wave')">🌊 Wave</button>
+      <div class="mth-row">
+        <button class="mth on" id="mKpay" onclick="setDM('kpay')">📱 KPay</button>
+        <button class="mth"    id="mWave" onclick="setDM('wave')">🌊 Wave</button>
       </div>
       <div class="gap">
-        <div><div class="inp-lbl">ပေးပို့သူ အမည်</div><input class="inp" id="dName" placeholder="သင့်အမည်"></div>
-        <div><div class="inp-lbl">Transaction ID</div><input class="inp" id="dTxn" placeholder="1234567890"></div>
-        <div><div class="inp-lbl">ပမာဏ (ကျပ်)</div><input class="inp" id="dAmt" type="number" placeholder="5000" min="500"></div>
+        <div><div class="lbl">ပေးပို့သူ အမည်</div><input class="inp" id="dName" placeholder="သင့်အမည်"></div>
+        <div><div class="lbl">Transaction ID</div><input class="inp" id="dTxn" placeholder="1234567890"></div>
+        <div><div class="lbl">ပမာဏ (ကျပ်)</div><input class="inp" id="dAmt" type="number" placeholder="5000"></div>
         <button class="btn btn-grn" onclick="submitDep()">✅ တောင်းဆိုမည်</button>
       </div>
     </div>
   </div>
 
-  <!-- ── Withdraw Panel ── -->
-  <button class="collapse-btn mb10" onclick="togglePanel('wd')">
+  <!-- Withdraw Panel -->
+  <button class="collapse-btn" onclick="togglePanel('wd')">
     <span>💸 ငွေထုတ်ရန် (min 2,500 ကျပ်)</span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
   </button>
   <div class="panel" id="pWd">
     <div class="card">
       <div class="gap">
-        <div><div class="inp-lbl">KPay/Wave အမည်</div><input class="inp" id="wName" placeholder="သင့်အမည်"></div>
-        <div><div class="inp-lbl">KPay/Wave နံပါတ်</div><input class="inp" id="wNum" placeholder="09xxxxxxxxx"></div>
-        <div><div class="inp-lbl">ပမာဏ (ကျပ်)</div><input class="inp" id="wAmt" type="number" placeholder="2500" min="2500"></div>
-        <div class="method-row">
-          <button class="mth-btn sel" id="wMKpay" onclick="setWdMethod('kpay')">📱 KPay</button>
-          <button class="mth-btn" id="wMWave" onclick="setWdMethod('wave')">🌊 Wave</button>
+        <div><div class="lbl">KPay/Wave အမည်</div><input class="inp" id="wName" placeholder="သင့်အမည်"></div>
+        <div><div class="lbl">KPay/Wave နံပါတ်</div><input class="inp" id="wNum" placeholder="09xxxxxxxxx"></div>
+        <div><div class="lbl">ပမာဏ (ကျပ်)</div><input class="inp" id="wAmt" type="number" placeholder="2500"></div>
+        <div class="mth-row">
+          <button class="mth on" id="wMKpay" onclick="setWM('kpay')">📱 KPay</button>
+          <button class="mth"    id="wMWave" onclick="setWM('wave')">🌊 Wave</button>
         </div>
         <button class="btn btn-ylw" onclick="submitWd()">💸 တောင်းဆိုမည်</button>
       </div>
     </div>
   </div>
 
-  <!-- ── Referral Panel ── -->
-  <button class="collapse-btn mb10" onclick="togglePanel('ref')">
+  <!-- Referral Panel -->
+  <button class="collapse-btn" onclick="togglePanel('ref')">
     <span>🔗 Referral Link</span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
   </button>
   <div class="panel" id="pRef">
     <div class="card">
-      <div style="font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:9px;">
-        မိတ်ဆွေ ငွေဖြည့်တိုင်း / ဆော့တိုင်း <b style="color:#fcd34d;">Commission</b> ရမည်!<br>
-        <span style="font-size:11px;">(Agent percentage ပေါ်မူတည်သည်)</span>
-      </div>
+      <div style="font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:9px;">မိတ်ဆွေ ဆော့တိုင်း/ဖြည့်တိုင်း <b style="color:#fcd34d;">Commission</b> ရမည်!</div>
       <div class="ref-code" id="refCode">—</div>
-      <button class="btn btn-ylw" style="margin-top:9px;padding:10px;" onclick="copyRef()">📋 Link ကူးယူမည်</button>
-      <div id="refStats" style="margin-top:10px;font-size:12px;color:var(--dim);"></div>
+      <button class="btn btn-ylw" style="padding:10px;" onclick="copyRef()">📋 Link ကူးယူမည်</button>
+      <div id="refStats" style="margin-top:9px;font-size:12px;color:var(--dim);"></div>
     </div>
   </div>
 
-  <!-- ── Promo Code Panel ── -->
-  <button class="collapse-btn mb10" onclick="togglePanel('promo')">
-    <span>🎟️ Promo Code ရိုက်ထည့်ရန်</span>
+  <!-- Promo Code Panel -->
+  <button class="collapse-btn" onclick="togglePanel('promo')">
+    <span>🎟️ Promo Code</span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
   </button>
   <div class="panel" id="pPromo">
@@ -267,258 +183,173 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color
     </div>
   </div>
 
-  <!-- ── Game History ── -->
+  <!-- History -->
   <div class="card mb10">
-    <div class="sec-row"><div class="sec-lbl">🕐 ကစားမှတ်တမ်း</div></div>
+    <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px;">🕐 ကစားမှတ်တမ်း</div>
     <div id="histList"><div style="text-align:center;color:var(--dim);font-size:13px;padding:10px 0;">မှတ်တမ်း မရှိသေးပါ</div></div>
   </div>
 </div>
 
-<script src="config.js"></script>
 <script>
-/* ── CONFIG ─────────────────────────────────────────────── */
-const API = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'https://minebackend-dyyq.onrender.com';
+const API = typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : '';
 const tg  = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor?.('#0a0a14'); tg.setBackgroundColor?.('#0a0a14'); }
+if (tg) { tg.ready(); tg.expand(); }
 
-let me = null, payInfo = null, depMethod = 'kpay', wdMethod = 'kpay';
+let me=null, payInfo=null, depM='kpay', wdM='kpay';
 
-/* ── Toast ──────────────────────────────────────────────── */
-function toast(msg, ok=true, dur=2400) {
-  const el  = document.getElementById('toast');
-  const inn = document.getElementById('toast-msg');
-  inn.textContent = msg; inn.className = 'toast-inner ' + (ok ? 't-ok' : 't-err');
-  el.classList.add('show'); setTimeout(() => el.classList.remove('show'), dur);
+/* toast */
+function toast(msg,ok=true,ms=2400){
+  const el=document.getElementById('toast'),t=document.getElementById('tmsg');
+  t.textContent=msg; t.className='ti '+(ok?'t-ok':'t-err');
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),ms);
 }
 
-/* ── Init ───────────────────────────────────────────────── */
-async function init() {
-  try {
-    // Step 1: Health check ဦးစွာစစ်မည်
-    document.getElementById('ldr').innerHTML = \`
-      <div style="font-size:2.5rem;animation:pulse 1.2s ease-in-out infinite alternate;">💣</div>
-      <div style="font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Mines</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;">Backend ချိတ်ဆက်နေသည်...</div>
-      <div class="spin"></div>
-    \`;
+/* fetch helpers */
+async function api(path,body){
+  try{
+    const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const txt=await r.text();
+    try{return JSON.parse(txt);}
+    catch{return{error:'Backend မှ မမှန်သော response ရသည်: '+txt.slice(0,60)};}
+  }catch(e){return{error:'Backend ချိတ်ဆက်မရပါ: '+e.message};}
+}
+async function get(path){
+  try{const r=await fetch(API+path);const txt=await r.text();try{return JSON.parse(txt);}catch{return null;}}
+  catch{return null;}
+}
 
-    let healthOk = false;
-    try {
-      const h = await fetch(API + '/health', { signal: AbortSignal.timeout(10000) });
-      const ht = await h.text();
-      try { const hj = JSON.parse(ht); healthOk = hj.ok === true; }
-      catch { healthOk = false; }
-    } catch(he) { healthOk = false; }
+/* init */
+async function init(){
+  if(!API){return fatal('config.js ထဲ BACKEND_URL ထည့်ပါ');}
 
-    if (!healthOk) {
-      return fatal(\`
-        <div style="font-size:1.4rem;margin-bottom:6px;">🔴 Backend ချိတ်ဆက်မရပါ</div>
-        <div style="font-size:11px;color:#fca5a5;margin-bottom:10px;">Render Service ကို စစ်ဆေးပါ</div>
-        <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:8px 10px;margin-bottom:10px;word-break:break-all;">
-          <div style="font-size:9px;color:rgba(255,255,255,.4);margin-bottom:3px;">Backend URL:</div>
-          <div style="font-family:monospace;font-size:11px;color:#fcd34d;">\${API}</div>
-        </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.7;">
-          ① Render Dashboard ကိုသွားပါ<br>
-          ② Service ကို Manual Deploy လုပ်ပါ<br>
-          ③ Logs ထဲမှာ error စစ်ပါ
-        </div>
-        <button onclick="location.reload()" style="margin-top:12px;background:#f59e0b;border:none;color:#000;
-          padding:9px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;">🔄 ထပ်ကြိုးစား</button>
-      \`);
-    }
-
-    // Step 2: Auth
-    const body = tg?.initDataUnsafe?.user ? { initData: tg.initData } : { telegramId: '12345' };
-    const r = await post('/api/auth', body);
-    if (!r.ok) return fatal(r.error || 'Auth မအောင်မြင်ပါ');
-    me = r;
-    renderUser();
-    await Promise.all([loadPayInfo(), loadHistory(), loadRefStats()]);
-    hide('ldr'); show('app');
-  } catch(e) {
-    fatal(\`<div>ချိတ်ဆက်မှု ပြဿနာ</div>
-      <div style="font-family:monospace;font-size:10px;color:#fca5a5;margin-top:6px;word-break:break-all;">\${e.message}</div>
-      <button onclick="location.reload()" style="margin-top:10px;background:#f59e0b;border:none;color:#000;
-        padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">🔄 Retry</button>\`);
+  // Health check
+  const h=await get('/health');
+  if(!h?.ok){
+    return fatal(
+      '<div style="font-size:1.2rem;margin-bottom:8px;">🔴 Backend ချိတ်ဆက်မရပါ</div>'+
+      '<div style="font-size:11px;color:#fca5a5;margin-bottom:10px;">Render Service ကို စစ်ဆေးပါ</div>'+
+      '<div style="background:rgba(0,0,0,.35);border-radius:9px;padding:9px;word-break:break-all;margin-bottom:12px;">'+
+        '<div style="font-size:9px;color:rgba(255,255,255,.4);margin-bottom:3px;">URL:</div>'+
+        '<div style="font-family:monospace;font-size:11px;color:#fcd34d;">'+API+'</div>'+
+      '</div>'+
+      '<div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.8;">'+
+        '① Render → service → ♺ Manual Deploy<br>'+
+        '② ၁ မိနစ် စောင့်ပြီး ↓ Retry<br>'+
+        '③ config.js ထဲ URL မှန်မမှန် စစ်ပါ'+
+      '</div>'+
+      '<button onclick="location.reload()" style="margin-top:12px;background:#f59e0b;border:none;color:#000;padding:9px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;">🔄 Retry</button>'
+    );
   }
+
+  const body=tg?.initDataUnsafe?.user?{initData:tg.initData}:{telegramId:'12345'};
+  const r=await api('/api/auth',body);
+  if(!r.ok) return fatal(r.error||'Auth မအောင်မြင်ပါ');
+  me=r;
+  document.getElementById('balNum').textContent=(me.balance||0).toLocaleString();
+  document.getElementById('stGames').textContent=me.gamesPlayed||0;
+  const botUser=new URLSearchParams(location.search).get('bot')||'mines_bot';
+  document.getElementById('refCode').textContent=`https://t.me/${botUser}?start=${me.referralCode}`;
+  await Promise.all([loadPayInfo(),loadHistory(),loadRefStats()]);
+  document.getElementById('ldr').style.opacity='0';
+  setTimeout(()=>{document.getElementById('ldr').style.display='none';document.getElementById('app').style.display='block';},300);
 }
 
-function renderUser() {
-  document.getElementById('balNum').textContent  = fmt(me.balance);
-  document.getElementById('st-games').textContent = me.gamesPlayed || 0;
-  const link = `https://t.me/${getBotUser()}?start=${me.referralCode}`;
-  document.getElementById('refCode').textContent = link;
+function fatal(msg){
+  document.getElementById('ldr').innerHTML=
+    '<div style="max-width:300px;text-align:center;padding:0 16px;">'+
+    '<div style="font-size:2.5rem;margin-bottom:8px;">⚠️</div>'+
+    '<div style="color:#fca5a5;font-size:14px;line-height:1.6;">'+msg+'</div>'+
+    '</div>';
 }
 
-function getBotUser() { return new URLSearchParams(location.search).get('bot') || 'mines_bot'; }
-
-async function refreshBal() {
-  if (!me) return;
-  const r = await get(`/api/user/${me.telegramId}`);
-  if (!r.ok) return;
-  me.balance = r.balance; me.gamesPlayed = r.gamesPlayed;
-  renderUser(); loadHistory();
-  toast('✅ Balance ပြောင်းပြီ');
+async function refresh(){
+  if(!me) return init();
+  const u=await get(`/api/user/${me.telegramId}`);
+  if(u?.ok!==false){me.balance=u.balance||me.balance;document.getElementById('balNum').textContent=(me.balance||0).toLocaleString();}
+  await loadHistory();
+  toast('✅ Refreshed');
 }
 
-async function loadPayInfo() {
-  if (!me) return;
-  payInfo = await get(`/api/payment-info/${me.telegramId}`);
-  if (!payInfo) return;
-  document.getElementById('kpayNum').textContent  = payInfo.kpayNumber || '—';
-  document.getElementById('kpayName').textContent = payInfo.kpayName   || '—';
-  document.getElementById('payTag').textContent   = payInfo.isAgent ? '🎯 Agent KPay' : '📱 KPay';
-  if (!payInfo.hasWave) document.getElementById('mWave').style.display = 'none';
+async function loadPayInfo(){
+  if(!me) return;
+  payInfo=await get(`/api/payment-info/${me.telegramId}`);
+  if(!payInfo) return;
+  document.getElementById('kpayNum').textContent=payInfo.kpayNumber||'—';
+  document.getElementById('kpayName').textContent=payInfo.kpayName||'—';
+  document.getElementById('payTag').textContent=payInfo.isAgent?'🎯 Agent KPay':'📱 KPay';
+  if(!payInfo.hasWave) document.getElementById('mWave').style.display='none';
 }
 
-async function loadHistory() {
-  if (!me) return;
-  const list = await get(`/api/mines/history/${me.telegramId}`);
-  const el   = document.getElementById('histList');
-  if (!Array.isArray(list) || !list.length) return;
-  let wins=0, losses=0;
-  el.innerHTML = list.map(g => {
-    const won = g.status === 'cashout';
-    won ? wins++ : losses++;
-    const profit = won ? g.payout - g.betAmount : -g.betAmount;
+async function loadHistory(){
+  if(!me) return;
+  const list=await get(`/api/mines/history/${me.telegramId}`);
+  const el=document.getElementById('histList');
+  if(!Array.isArray(list)||!list.length) return;
+  let wins=0,losses=0;
+  el.innerHTML=list.map(g=>{
+    const won=g.status==='cashout';
+    won?wins++:losses++;
+    const profit=won?g.payout-g.betAmount:-g.betAmount;
     return `<div class="hist-row">
       <div style="display:flex;align-items:center;gap:8px;">
-        <div class="hi-icon ${won?'hi-win':'hi-lose'}">${won?'💵':'💣'}</div>
+        <div class="hi-icon" style="background:rgba(${won?'16,185,129':'239,68,68'},.15);">${won?'💵':'💣'}</div>
         <div>
-          <div style="font-size:13px;font-weight:700;">${fmt(g.betAmount)} ကျပ် · ${g.bombCount}💣</div>
-          <div style="font-size:11px;color:var(--dim);">${g.revealedTiles?.length||0} ကွက် · ${won?(g.multiplier||0).toFixed(2)+'×':'ဗုံးထိ'}</div>
+          <div style="font-size:12px;font-weight:700;">${(g.betAmount||0).toLocaleString()} · ${g.bombCount}💣</div>
+          <div style="font-size:10px;color:var(--dim);">${g.revealedTiles?.length||0}ကွက် · ${won?(g.multiplier||0).toFixed(2)+'×':'ထိ'}</div>
         </div>
       </div>
-      <div style="text-align:right;font-weight:800;font-size:13px;color:${won?'#6ee7b7':'#fca5a5'};">
-        ${profit>=0?'+':''}${fmt(Math.abs(profit))}
-      </div>
+      <div style="font-weight:800;font-size:12px;color:${won?'#6ee7b7':'#fca5a5'};">${profit>=0?'+':''}${Math.abs(profit).toLocaleString()}</div>
     </div>`;
   }).join('');
-  document.getElementById('st-won').textContent  = wins;
-  document.getElementById('st-lost').textContent = losses;
+  document.getElementById('stWon').textContent=wins;
+  document.getElementById('stLost').textContent=losses;
 }
 
-async function loadRefStats() {
-  if (!me) return;
-  const r = await get(`/api/referrals/${me.telegramId}`);
-  if (r?.total) document.getElementById('refStats').textContent = `မိတ်ဆွေ ${r.total} ယောက်`;
+async function loadRefStats(){
+  if(!me) return;
+  const r=await get(`/api/referrals/${me.telegramId}`);
+  if(r?.total) document.getElementById('refStats').textContent=`မိတ်ဆွေ ${r.total} ယောက်`;
 }
 
-/* ── Panels ─────────────────────────────────────────────── */
-const panelMap = { dep:'pDep', wd:'pWd', ref:'pRef', promo:'pPromo' };
-let openPanel = null;
-function togglePanel(k) {
-  const id = panelMap[k];
-  if (!id) return;
-  const el = document.getElementById(id);
-  if (openPanel && openPanel !== id) document.getElementById(openPanel).classList.remove('open');
-  el.classList.toggle('open');
-  openPanel = el.classList.contains('open') ? id : null;
-  if (k === 'dep') loadPayInfo();
+/* panels */
+const panelMap={dep:'pDep',wd:'pWd',ref:'pRef',promo:'pPromo'};
+let openP=null;
+function togglePanel(k){const id=panelMap[k];if(!id) return;const el=document.getElementById(id);if(openP&&openP!==id)document.getElementById(openP).classList.remove('open');el.classList.toggle('open');openP=el.classList.contains('open')?id:null;if(k==='dep')loadPayInfo();}
+function openPanel(k){const id=panelMap[k];if(!id) return;const el=document.getElementById(id);if(openP&&openP!==id)document.getElementById(openP).classList.remove('open');el.classList.add('open');openP=id;if(k==='dep')loadPayInfo();}
+
+/* payment methods */
+function setDM(m){depM=m;document.getElementById('mKpay').classList.toggle('on',m==='kpay');document.getElementById('mWave').classList.toggle('on',m==='wave');if(payInfo){document.getElementById('kpayNum').textContent=m==='wave'?(payInfo.waveNumber||'—'):(payInfo.kpayNumber||'—');document.getElementById('kpayName').textContent=m==='wave'?(payInfo.waveName||'—'):(payInfo.kpayName||'—');}}
+function setWM(m){wdM=m;document.getElementById('wMKpay').classList.toggle('on',m==='kpay');document.getElementById('wMWave').classList.toggle('on',m==='wave');}
+function copyTxt(id){navigator.clipboard?.writeText(document.getElementById(id)?.textContent).then(()=>toast('✅ ကူးပြီ'));}
+function copyRef(){navigator.clipboard?.writeText(document.getElementById('refCode').textContent).then(()=>toast('✅ Link ကူးပြီ'));}
+
+/* deposit */
+async function submitDep(){
+  const n=document.getElementById('dName').value.trim(),t=document.getElementById('dTxn').value.trim(),a=parseInt(document.getElementById('dAmt').value);
+  if(!n||!t||!a) return toast('ကွင်းလပ်တွေ ဖြည့်ပေးပါ',false);
+  if(a<500) return toast('အနည်းဆုံး 500 ကျပ်',false);
+  const r=await api('/api/deposit',{telegramId:me.telegramId,kpayName:n,transactionId:t,amount:a,paymentMethod:depM});
+  r.ok?(toast('✅ ငွေဖြည့် တောင်းဆိုမှု ပေးပို့ပြီ'),document.getElementById('dName').value='',document.getElementById('dTxn').value='',document.getElementById('dAmt').value=''):toast(r.error||'Error',false);
 }
 
-/* ── Payment methods ────────────────────────────────────── */
-function setMethod(m) {
-  depMethod = m;
-  document.getElementById('mKpay').classList.toggle('sel', m==='kpay');
-  document.getElementById('mWave').classList.toggle('sel', m==='wave');
-  if (payInfo) {
-    document.getElementById('kpayNum').textContent  = m==='wave' ? payInfo.waveNumber||'—' : payInfo.kpayNumber||'—';
-    document.getElementById('kpayName').textContent = m==='wave' ? payInfo.waveName||'—'   : payInfo.kpayName||'—';
-  }
-}
-function setWdMethod(m) {
-  wdMethod = m;
-  document.getElementById('wMKpay').classList.toggle('sel', m==='kpay');
-  document.getElementById('wMWave').classList.toggle('sel', m==='wave');
-}
-function copyNum(id) {
-  const t = document.getElementById(id)?.textContent;
-  navigator.clipboard?.writeText(t).then(()=>toast('✅ ကူးပြီ'));
-}
-function copyRef() {
-  navigator.clipboard?.writeText(document.getElementById('refCode').textContent).then(()=>toast('✅ Link ကူးပြီ'));
+/* withdraw */
+async function submitWd(){
+  const n=document.getElementById('wName').value.trim(),num=document.getElementById('wNum').value.trim(),a=parseInt(document.getElementById('wAmt').value);
+  if(!n||!num||!a) return toast('ကွင်းလပ်တွေ ဖြည့်ပေးပါ',false);
+  if(a<2500) return toast('အနည်းဆုံး 2,500 ကျပ်',false);
+  const r=await api('/api/withdraw',{telegramId:me.telegramId,kpayName:n,kpayNumber:num,amount:a,paymentMethod:wdM});
+  if(r.ok){me.balance=r.newBalance;document.getElementById('balNum').textContent=(r.newBalance||0).toLocaleString();toast('✅ ငွေထုတ် တောင်းဆိုမှု ပေးပို့ပြီ');}else toast(r.error||'Error',false);
 }
 
-/* ── Deposit ─────────────────────────────────────────────── */
-async function submitDep() {
-  const kpayName     = val('dName');
-  const transactionId = val('dTxn');
-  const amount       = parseInt(val('dAmt'));
-  if (!kpayName || !transactionId || !amount) return toast('ကွင်းလပ်တွေ ဖြည့်ပေးပါ', false);
-  if (amount < 500) return toast('အနည်းဆုံး 500 ကျပ်', false);
-  const r = await post('/api/deposit', { telegramId: me.telegramId, kpayName, transactionId, amount, paymentMethod: depMethod });
-  r.ok ? (toast('✅ ငွေဖြည့် တောင်းဆိုမှု ပေးပို့ပြီ'), setVal('dName',''), setVal('dTxn',''), setVal('dAmt',''))
-       : toast(r.error||'Error', false);
+/* redeem */
+async function redeemCode(){
+  const code=document.getElementById('promoCode').value.trim().toUpperCase();
+  if(!code) return toast('Code ရိုက်ထည့်ပါ',false);
+  const r=await api('/api/redeem',{telegramId:me.telegramId,code});
+  if(r.ok){me.balance=r.newBalance;document.getElementById('balNum').textContent=(r.newBalance||0).toLocaleString();toast(`🎉 +${r.amount.toLocaleString()} ကျပ် ရပြီ!`);document.getElementById('promoCode').value='';}else toast(r.error||'Error',false);
 }
 
-/* ── Withdraw ────────────────────────────────────────────── */
-async function submitWd() {
-  const kpayName   = val('wName');
-  const kpayNumber = val('wNum');
-  const amount     = parseInt(val('wAmt'));
-  if (!kpayName || !kpayNumber || !amount) return toast('ကွင်းလပ်တွေ ဖြည့်ပေးပါ', false);
-  if (amount < 2500) return toast('အနည်းဆုံး 2,500 ကျပ်', false);
-  const r = await post('/api/withdraw', { telegramId: me.telegramId, kpayName, kpayNumber, amount, paymentMethod: wdMethod });
-  if (r.ok) {
-    me.balance = r.newBalance;
-    document.getElementById('balNum').textContent = fmt(r.newBalance);
-    toast('✅ ငွေထုတ် တောင်းဆိုမှု ပေးပို့ပြီ');
-    setVal('wName',''); setVal('wNum',''); setVal('wAmt','');
-  } else toast(r.error||'Error', false);
-}
-
-/* ── Redeem ──────────────────────────────────────────────── */
-async function redeemCode() {
-  const code = val('promoCode').toUpperCase();
-  if (!code) return toast('Code ရိုက်ထည့်ပေးပါ', false);
-  const r = await post('/api/redeem', { telegramId: me.telegramId, code });
-  if (r.ok) {
-    me.balance = r.newBalance;
-    document.getElementById('balNum').textContent = fmt(r.newBalance);
-    toast(`🎉 +${fmt(r.amount)} ကျပ် ရရှိပြီ!`);
-    setVal('promoCode','');
-  } else toast(r.error||'Error', false);
-}
-
-/* ── Nav ─────────────────────────────────────────────────── */
-function goPlay() { location.href = 'play.html'; }
-
-/* ── Helpers ─────────────────────────────────────────────── */
-const fmt   = n  => (n||0).toLocaleString();
-const val   = id => document.getElementById(id)?.value.trim() || '';
-const setVal= (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
-function show(id){ const el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.display='block'; requestAnimationFrame(()=>{el.style.transition='opacity .35s';el.style.opacity='1';}); }}
-function hide(id){ const el=document.getElementById(id); if(el){ el.style.opacity='0'; setTimeout(()=>el.style.display='none',350); }}
-function fatal(msg){ document.getElementById('ldr').innerHTML=`<div style="font-size:2rem;">⚠️</div><div style="color:#fca5a5;font-size:14px;text-align:center;max-width:260px;">${msg}</div>`; }
-
-async function post(path, body, extraHeaders={}) {
-  try {
-    const r = await fetch(API + path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...extraHeaders },
-      body: JSON.stringify(body)
-    });
-    const text = await r.text();
-    try { return JSON.parse(text); }
-    catch { return { error: 'Backend မှ HTML ပြန်လာသည် — Backend URL မှားနေနိုင်သည်: ' + API }; }
-  } catch(e) {
-    return { error: 'Backend ချိတ်ဆက်မရပါ (' + API + '): ' + e.message };
-  }
-}); return r.json(); }
-  catch(e){ return { error: e.message }; }
-}
-async function get(path) {
-  try {
-    const r = await fetch(API + path);
-    const text = await r.text();
-    try { return JSON.parse(text); }
-    catch { return null; }
-  } catch { return null; }
-}
-}
-
+function goPlay(){location.href='play.html';}
 init();
 </script>
 </body>

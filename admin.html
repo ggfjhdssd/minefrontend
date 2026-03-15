@@ -3,48 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>🛡️ Mines Admin</title>
+<title>🛡️ Admin</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <style>
-:root{--bg:#0a0a14;--sur:rgba(255,255,255,.045);--bdr:rgba(255,255,255,.08);--acc:#f59e0b;--grn:#10b981;--red:#ef4444;--tx:#e8e8f0;--dim:rgba(255,255,255,.38);}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--bg:#0a0a14;--sur:rgba(255,255,255,.05);--bdr:rgba(255,255,255,.09);--acc:#f59e0b;--grn:#10b981;--red:#ef4444;--tx:#e8e8f0;--dim:rgba(255,255,255,.4);}
+*{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--tx);padding:12px;max-width:500px;margin:0 auto;}
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
 .card{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:9px;}
-.hdr{font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
-.lbl{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.hdr{font-size:1.2rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
 .sbox{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px;}
-.sv{font-size:1.2rem;font-weight:900;}.sl{font-size:9px;color:var(--dim);margin-top:2px;}
-.btn{width:100%;padding:10px;border:none;border-radius:10px;font-family:'Outfit',sans-serif;
-  font-weight:700;font-size:13px;cursor:pointer;color:#fff;transition:.14s;margin-bottom:6px;}
+.sv{font-size:1.15rem;font-weight:900;}.sl{font-size:9px;color:var(--dim);margin-top:2px;}
+.btn{width:100%;padding:10px;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:#fff;margin-bottom:6px;transition:.14s;}
 .btn:active{transform:scale(.96);}
-.btn-grn{background:linear-gradient(135deg,#059669,#10b981);}
-.btn-red{background:linear-gradient(135deg,#be123c,#ef4444);}
-.btn-ylw{background:linear-gradient(135deg,#b45309,#f59e0b);}
-.btn-blu{background:linear-gradient(135deg,#1e40af,#3b82f6);}
-.btn-grey{background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--tx);}
-.inp{width:100%;padding:9px 12px;background:rgba(0,0,0,.25);border:1.5px solid var(--bdr);
-  border-radius:9px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:13px;outline:none;margin-bottom:6px;}
+.bg{background:linear-gradient(135deg,#059669,#10b981);}
+.br{background:linear-gradient(135deg,#be123c,#ef4444);}
+.by{background:linear-gradient(135deg,#b45309,#f59e0b);}
+.bb{background:linear-gradient(135deg,#1e40af,#3b82f6);}
+.bk{background:rgba(255,255,255,.08);border:1px solid var(--bdr);color:var(--tx);}
+.inp{width:100%;padding:9px 12px;background:rgba(0,0,0,.25);border:1.5px solid var(--bdr);border-radius:9px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:13px;outline:none;margin-bottom:6px;}
 .inp:focus{border-color:var(--acc);}
 .tabs{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
-.tab{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--dim);transition:.13s;}
+.tab{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--dim);transition:.13s;}
 .tab.on{background:rgba(245,159,11,.2);border-color:var(--acc);color:#fcd34d;}
-.panel{display:none;}.panel.on{display:block;}
+.pn{display:none;}.pn.on{display:block;}
 .row{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
 .row:last-child{border-bottom:none;}
 .sub{font-size:10px;color:var(--dim);margin-top:2px;}
+.rbrow{display:flex;gap:5px;margin-top:6px;}
 .badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;}
-.bg-ylw{background:rgba(245,184,0,.18);color:#fde68a;}
-.bg-grn{background:rgba(16,185,129,.18);color:#6ee7b7;}
-.bg-red{background:rgba(239,68,68,.18);color:#fca5a5;}
-.toggle{display:flex;align-items:center;justify-content:space-between;padding:9px 0;}
+.by2{background:rgba(245,184,0,.18);color:#fde68a;}
+.bg2{background:rgba(16,185,129,.18);color:#6ee7b7;}
+.br2{background:rgba(239,68,68,.18);color:#fca5a5;}
+.tg{display:flex;align-items:center;justify-content:space-between;padding:9px 0;}
 .sw{width:40px;height:22px;background:rgba(255,255,255,.12);border-radius:11px;position:relative;cursor:pointer;transition:.2s;}
 .sw.on{background:var(--grn);}
 .sw::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s;}
 .sw.on::after{left:20px;}
-.row-btns{display:flex;gap:5px;margin-top:6px;}
 .ldr{text-align:center;color:var(--dim);padding:14px;font-size:13px;}
 #toast{position:fixed;top:10px;left:50%;transform:translateX(-50%) translateY(-55px);z-index:999;transition:.3s cubic-bezier(.68,-.55,.265,1.55);opacity:0;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -53,306 +50,198 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color
 </style>
 </head>
 <body>
-<div id="toast"><div class="ti" id="tmsg"></div></div>
-<div id="err" style="display:none;padding:40px 20px;text-align:center;color:#fca5a5;font-size:14px;"></div>
+<div id="toast"><div class="ti" id="tm"></div></div>
+<div id="err" style="display:none;padding:50px 20px;text-align:center;color:#fca5a5;font-size:14px;line-height:1.7;"></div>
 <div id="app" style="display:none;">
-
-<div class="hdr">🛡️ Mines Admin</div>
-<div class="stat-grid" id="statGrid"></div>
-
-<div class="tabs">
-  <div class="tab on"  onclick="tab('dep',this)">💰 ငွေဖြည့်</div>
-  <div class="tab"     onclick="tab('wd',this)">💸 ငွေထုတ်</div>
-  <div class="tab"     onclick="tab('users',this)">👥 Users</div>
-  <div class="tab"     onclick="tab('agents',this)">🎯 Agents</div>
-  <div class="tab"     onclick="tab('rounds',this)">🎲 Rounds</div>
-  <div class="tab"     onclick="tab('tools',this)">⚙️ Tools</div>
-</div>
-
-<!-- Deposits -->
-<div class="panel on" id="pDep">
-  <div class="tabs" id="depTabs">
-    <div class="tab on"  onclick="loadDeps('pending',this)">⏳ Pending</div>
-    <div class="tab"     onclick="loadDeps('confirmed',this)">✅ Confirmed</div>
-    <div class="tab"     onclick="loadDeps('rejected',this)">❌ Rejected</div>
+  <div class="hdr">🛡️ Mines Admin</div>
+  <div class="sg" id="sg"></div>
+  <div class="tabs">
+    <div class="tab on" onclick="tab('dep',this)">💰 ငွေဖြည့်</div>
+    <div class="tab"    onclick="tab('wd',this)">💸 ငွေထုတ်</div>
+    <div class="tab"    onclick="tab('usr',this)">👥 Users</div>
+    <div class="tab"    onclick="tab('ag',this)">🎯 Agents</div>
+    <div class="tab"    onclick="tab('tl',this)">⚙️ Tools</div>
   </div>
-  <div id="depList" class="ldr">Loading...</div>
-</div>
-
-<!-- Withdrawals -->
-<div class="panel" id="pWd">
-  <div class="tabs" id="wdTabs">
-    <div class="tab on"  onclick="loadWds('pending',this)">⏳ Pending</div>
-    <div class="tab"     onclick="loadWds('confirmed',this)">✅ Confirmed</div>
-    <div class="tab"     onclick="loadWds('rejected',this)">❌ Rejected</div>
+  <div class="pn on" id="pDep">
+    <div class="tabs" id="dtabs"><div class="tab on" onclick="ldep('pending',this)">⏳ Pending</div><div class="tab" onclick="ldep('confirmed',this)">✅ Done</div><div class="tab" onclick="ldep('rejected',this)">❌ Rejected</div></div>
+    <div id="depList" class="ldr">Loading...</div>
   </div>
-  <div id="wdList" class="ldr">Loading...</div>
-</div>
-
-<!-- Users -->
-<div class="panel" id="pUsers">
-  <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <input class="inp" id="userQ" placeholder="TelegramID / Username" style="margin-bottom:0;flex:1;">
-    <button class="btn btn-ylw" style="width:auto;padding:9px 14px;margin-bottom:0;" onclick="searchUsers()">ရှာ</button>
+  <div class="pn" id="pWd">
+    <div class="tabs" id="wtabs"><div class="tab on" onclick="lwd('pending',this)">⏳ Pending</div><div class="tab" onclick="lwd('confirmed',this)">✅ Done</div><div class="tab" onclick="lwd('rejected',this)">❌ Rejected</div></div>
+    <div id="wdList" class="ldr">Loading...</div>
   </div>
-  <div id="userList" class="ldr">ရှာဖွေပါ</div>
-</div>
-
-<!-- Agents -->
-<div class="panel" id="pAgents">
-  <button class="btn btn-blu" onclick="loadAgents()">🔄 Agents ဆွဲယူ</button>
-  <div id="agentList" class="ldr">—</div>
-</div>
-
-<!-- Rounds history -->
-<div class="panel" id="pRounds">
-  <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <input class="inp" id="roundQ" placeholder="TelegramID (optional)" style="margin-bottom:0;flex:1;">
-    <button class="btn btn-ylw" style="width:auto;padding:9px 14px;margin-bottom:0;" onclick="loadRounds()">ရှာ</button>
+  <div class="pn" id="pUsr">
+    <div style="display:flex;gap:6px;margin-bottom:8px;"><input class="inp" id="uQ" placeholder="ID / Username" style="margin-bottom:0;flex:1;"><button class="btn bb" style="width:auto;padding:9px 14px;margin-bottom:0;" onclick="lusr()">ရှာ</button></div>
+    <div id="usrList" class="ldr">ရှာဖွေပါ</div>
   </div>
-  <div id="roundList" class="ldr">ရှာဖွေပါ</div>
-</div>
-
-<!-- Tools -->
-<div class="panel" id="pTools">
-  <div class="card">
-    <div class="lbl">🔧 Maintenance Mode</div>
-    <div class="toggle">
-      <div>
-        <div style="font-size:13px;font-weight:700;">Maintenance</div>
-        <div class="sub">ဖွင့်ထားရင် Admin မှတပါး မကစားနိုင်</div>
-      </div>
-      <div class="sw" id="swMaint" onclick="toggleMaint()"></div>
+  <div class="pn" id="pAg">
+    <button class="btn bb" onclick="lag()">🔄 Agents ဆွဲယူ</button>
+    <div id="agList" class="ldr">—</div>
+  </div>
+  <div class="pn" id="pTl">
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">Maintenance</div>
+      <div class="tg"><div><div style="font-size:13px;font-weight:700;">Maintenance Mode</div><div class="sub">ဖွင့်ထားရင် Admin မှတပါး မကစားနိုင်</div></div><div class="sw" id="swM" onclick="toggleM()"></div></div>
+    </div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">📢 Broadcast</div>
+      <textarea class="inp" id="bMsg" rows="3" placeholder="မက်ဆေ့ (HTML OK)" style="resize:none;"></textarea>
+      <input class="inp" id="bBT" placeholder="Button text (optional)">
+      <input class="inp" id="bBU" placeholder="Button URL (optional)">
+      <button class="btn by" onclick="broadcast()">📢 ပို့မည်</button>
+    </div>
+    <div class="card"><div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;margin-bottom:6px;">🎟️ Redeem Code</div>
+      <input class="inp" id="rcC" placeholder="CODE">
+      <input class="inp" id="rcA" type="number" placeholder="Amount MMK">
+      <input class="inp" id="rcM" type="number" placeholder="Max Uses (1)">
+      <button class="btn bg" onclick="createCode()">✅ ဖန်တီး</button>
+      <button class="btn bk" onclick="lcodes()">🔄 List</button>
+      <div id="codeList"></div>
     </div>
   </div>
-  <div class="card">
-    <div class="lbl">📢 Broadcast</div>
-    <textarea class="inp" id="bMsg" rows="3" placeholder="မက်ဆေ့ (HTML OK)" style="resize:none;"></textarea>
-    <input class="inp" id="bBtnTxt" placeholder="Button text (optional)">
-    <input class="inp" id="bBtnUrl" placeholder="Button URL (optional)">
-    <button class="btn btn-ylw" onclick="sendBroadcast()">📢 ပို့မည်</button>
-  </div>
-  <div class="card">
-    <div class="lbl">🎟️ Redeem Code</div>
-    <input class="inp" id="rcCode" placeholder="CODE">
-    <input class="inp" id="rcAmt"  type="number" placeholder="Amount MMK">
-    <input class="inp" id="rcMax"  type="number" placeholder="Max Uses">
-    <button class="btn btn-grn" onclick="createCode()">✅ ဖန်တီးမည်</button>
-    <button class="btn btn-grey" onclick="loadCodes()">🔄 Codes ကြည့်မည်</button>
-    <div id="codeList"></div>
-  </div>
 </div>
 
-</div><!-- #app -->
-<script src="config.js"></script>
 <script>
-const API = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'https://minebackend-dyyq.onrender.com';
-const tg  = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+const API=typeof BACKEND_URL!=='undefined'?BACKEND_URL:'';
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+let aid=null,maint=false;
 
-let aid = null, maint = false;
-
-function toast(msg, ok=true){
-  const el=document.getElementById('toast'), t=document.getElementById('tmsg');
-  t.textContent=msg; t.className='ti '+(ok?'tok':'terr');
-  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2400);
-}
-async function post(path, body, extraHeaders={}) {
-  try {
-    const r = await fetch(API + path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...extraHeaders },
-      body: JSON.stringify(body)
-    });
-    const text = await r.text();
-    try { return JSON.parse(text); }
-    catch { return { error: 'Backend မှ HTML ပြန်လာသည် — Backend URL မှားနေနိုင်သည်: ' + API }; }
-  } catch(e) {
-    return { error: 'Backend ချိတ်ဆက်မရပါ (' + API + '): ' + e.message };
-  }
-}); return r.json(); } catch(e){return{error:e.message};} }
-async function get(path){ try{ return (await fetch(API+path,{headers:{'x-admin-id':aid}})).json(); } catch{ return null; } }
+function toast(msg,ok=true){const el=document.getElementById('toast'),t=document.getElementById('tm');t.textContent=msg;t.className='ti '+(ok?'tok':'terr');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
+async function go(path,body,h={}){try{const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json','x-admin-id':aid,...h},body:JSON.stringify(body)});const txt=await r.text();try{return JSON.parse(txt);}catch{return{error:txt.slice(0,80)};}}catch(e){return{error:e.message};}}
+async function get(path){try{const r=await fetch(API+path,{headers:{'x-admin-id':aid}});const txt=await r.text();try{return JSON.parse(txt);}catch{return null;}}catch{return null;}}
 
 async function init(){
-  const uid = tg?.initDataUnsafe?.user?.id;
-  if(!uid){ err('Telegram မှ ဖွင့်ပါ'); return; }
-  aid = uid;
-  const r = await post('/api/admin/verify',{telegramId:uid},{});
-  if(!r.ok){ err('🚫 Admin မဟုတ်ပါ'); return; }
+  const uid=tg?.initDataUnsafe?.user?.id;
+  if(!uid){document.getElementById('err').innerHTML='⚠️ Telegram မှ ဖွင့်ပါ';document.getElementById('err').style.display='block';return;}
+  aid=uid;
+  const r=await go('/api/admin/verify',{telegramId:uid},{});
+  if(!r.ok){document.getElementById('err').innerHTML='🚫 Admin မဟုတ်ပါ<br><small>ADMIN_ID စစ်ဆေးပါ</small>';document.getElementById('err').style.display='block';return;}
   document.getElementById('app').style.display='block';
-  loadStats(); loadDeps('pending');
+  lstat();ldep('pending');
 }
-function err(m){ const el=document.getElementById('err'); el.textContent=m; el.style.display='block'; }
 
-async function loadStats(){
+async function lstat(){
   const [d,s]=await Promise.all([get('/api/admin/stats'),get('/api/admin/settings')]);
   if(!d) return;
-  const profit=d.houseProfit||0;
-  document.getElementById('statGrid').innerHTML=`
+  const pr=d.houseProfit||0;
+  document.getElementById('sg').innerHTML=`
     <div class="sbox"><div class="sv">${d.users||0}</div><div class="sl">👥 Users</div></div>
     <div class="sbox"><div class="sv">${d.games||0}</div><div class="sl">🎲 Rounds</div></div>
-    <div class="sbox"><div class="sv" style="color:#fca5a5">${d.pdep||0}</div><div class="sl">⏳ Dep Pending</div></div>
-    <div class="sbox"><div class="sv" style="color:#fca5a5">${d.pwd||0}</div><div class="sl">⏳ WD Pending</div></div>
-    <div class="sbox"><div class="sv" style="color:#6ee7b7">${(d.totalDeposited||0).toLocaleString()}</div><div class="sl">💰 Total Deposit</div></div>
-    <div class="sbox"><div class="sv" style="color:#fca5a5">${(d.totalWithdrawn||0).toLocaleString()}</div><div class="sl">💸 Total WD</div></div>
+    <div class="sbox"><div class="sv" style="color:#fca5a5">${d.pdep||0}</div><div class="sl">⏳ Dep</div></div>
+    <div class="sbox"><div class="sv" style="color:#fca5a5">${d.pwd||0}</div><div class="sl">⏳ WD</div></div>
+    <div class="sbox"><div class="sv" style="color:#6ee7b7">${(d.totalDeposited||0).toLocaleString()}</div><div class="sl">💰 Deposited</div></div>
+    <div class="sbox"><div class="sv" style="color:#fca5a5">${(d.totalWithdrawn||0).toLocaleString()}</div><div class="sl">💸 Withdrawn</div></div>
     <div class="sbox"><div class="sv">${(d.totalBet||0).toLocaleString()}</div><div class="sl">🎰 Total Bet</div></div>
-    <div class="sbox"><div class="sv" style="color:${profit>=0?'#6ee7b7':'#fca5a5'}">${profit.toLocaleString()}</div><div class="sl">💹 House Profit</div></div>
-    <div class="sbox"><div class="sv">${d.activeGames||0}</div><div class="sl">🎮 Active</div></div>
-    <div class="sbox"><div class="sv">${(d.totalWon||0).toLocaleString()}</div><div class="sl">🏆 Total Won</div></div>`;
-  if(s){ maint=s.maintenance; const sw=document.getElementById('swMaint'); maint?sw.classList.add('on'):sw.classList.remove('on'); }
+    <div class="sbox"><div class="sv" style="color:${pr>=0?'#6ee7b7':'#fca5a5'}">${pr.toLocaleString()}</div><div class="sl">💹 Profit</div></div>`;
+  if(s){maint=s.maintenance;const sw=document.getElementById('swM');maint?sw.classList.add('on'):sw.classList.remove('on');}
 }
 
-/* ── Tabs ──────────────────────────────────────────────── */
-const tabPanels=['Dep','Wd','Users','Agents','Rounds','Tools'];
-function tab(name, el){
-  tabPanels.forEach(n=>{ const p=document.getElementById('p'+n.charAt(0).toUpperCase()+n.slice(1)); if(p) p.classList.remove('on'); });
-  const key=name.charAt(0).toUpperCase()+name.slice(1);
-  document.getElementById('p'+key)?.classList.add('on');
-  document.querySelectorAll('.tabs:first-of-type .tab').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  if(name==='dep') loadDeps('pending');
-  if(name==='wd')  loadWds('pending');
+function tab(n,el){
+  ['Dep','Wd','Usr','Ag','Tl'].forEach(x=>document.getElementById('p'+x).classList.remove('on'));
+  document.getElementById('p'+n.charAt(0).toUpperCase()+n.slice(1)).classList.add('on');
+  document.querySelectorAll('.tabs:first-of-type .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  if(n==='dep')ldep('pending');if(n==='wd')lwd('pending');
 }
 
-/* ── Deposits ──────────────────────────────────────────── */
-async function loadDeps(status, el){
-  if(el){ document.querySelectorAll('#depTabs .tab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); }
+async function ldep(st,el){
+  if(el){document.querySelectorAll('#dtabs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');}
   document.getElementById('depList').innerHTML='<div class="ldr">Loading...</div>';
-  const list = await get(`/api/admin/deposits?status=${status}`);
-  if(!list?.length){ document.getElementById('depList').innerHTML='<div class="ldr">မရှိသေးပါ</div>'; return; }
-  document.getElementById('depList').innerHTML = list.map(d=>`
-    <div class="row">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-weight:700;font-size:13px;">${d.userName||d.userId} <span class="badge bg-ylw">${(d.paymentMethod||'').toUpperCase()}</span></div>
-          <div class="sub">💵 ${(d.amount||0).toLocaleString()} ကျပ် · 📝 ${d.kpayName||'—'}</div>
-          <div class="sub" style="font-family:monospace;font-size:9px;">🔢 ${d.transactionId||'—'}</div>
-        </div>
-        <div class="sub">${new Date(d.createdAt).toLocaleDateString()}</div>
-      </div>
-      ${status==='pending'?`<div class="row-btns">
-        <button class="btn btn-grn" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="confDep('${d._id}')">✅ Confirm</button>
-        <button class="btn btn-red" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="rejDep('${d._id}')">❌ Reject</button>
-      </div>`:''}
-    </div>`).join('');
-}
-async function confDep(id){ if(!confirm('Confirm?')) return; const r=await post(`/api/admin/deposits/${id}/confirm`,{}); r.ok?(toast('✅ Confirmed'),loadDeps('pending'),loadStats()):toast(r.error||'Error',false); }
-async function rejDep(id){ const reason=prompt('Reason (optional):'); const r=await post(`/api/admin/deposits/${id}/reject`,{reason}); r.ok?(toast('❌ Rejected'),loadDeps('pending')):toast(r.error||'Error',false); }
-
-/* ── Withdrawals ───────────────────────────────────────── */
-async function loadWds(status, el){
-  if(el){ document.querySelectorAll('#wdTabs .tab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); }
-  document.getElementById('wdList').innerHTML='<div class="ldr">Loading...</div>';
-  const list = await get(`/api/admin/withdrawals?status=${status}`);
-  if(!list?.length){ document.getElementById('wdList').innerHTML='<div class="ldr">မရှိသေးပါ</div>'; return; }
-  document.getElementById('wdList').innerHTML = list.map(w=>`
+  const list=await get(`/api/admin/deposits?status=${st}`);
+  if(!list?.length){document.getElementById('depList').innerHTML='<div class="ldr">မရှိသေးပါ</div>';return;}
+  document.getElementById('depList').innerHTML=list.map(d=>`
     <div class="row">
       <div style="display:flex;justify-content:space-between;">
-        <div>
-          <div style="font-weight:700;font-size:13px;">${w.userName||w.userId} <span class="badge bg-ylw">${(w.paymentMethod||'').toUpperCase()}</span></div>
-          <div class="sub">💵 ${(w.amount||0).toLocaleString()} · 📱 ${w.kpayNumber||'—'} — ${w.kpayName||'—'}</div>
-          <div class="sub">🏦 ကျန်: ${(w.userBalance||0).toLocaleString()}</div>
-        </div>
-        <div class="sub">${new Date(w.createdAt).toLocaleDateString()}</div>
+        <div><div style="font-weight:700;font-size:13px;">${d.userName||d.userId} <span class="badge by2">${(d.paymentMethod||'').toUpperCase()}</span></div>
+        <div class="sub">💵 ${(d.amount||0).toLocaleString()} · 📝 ${d.kpayName||'—'}</div>
+        <div class="sub" style="font-family:monospace;font-size:9px;">🔢 ${d.transactionId||'—'}</div></div>
+        <div class="sub">${new Date(d.createdAt).toLocaleDateString()}</div>
       </div>
-      ${status==='pending'?`<div class="row-btns">
-        <button class="btn btn-grn" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="confWd('${w._id}')">✅ Confirm</button>
-        <button class="btn btn-red" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="rejWd('${w._id}')">❌ Reject+Refund</button>
+      ${st==='pending'?`<div class="rbrow">
+        <button class="btn bg" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="cdep('${d._id}')">✅ Confirm</button>
+        <button class="btn br" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="rdep('${d._id}')">❌ Reject</button>
       </div>`:''}
     </div>`).join('');
 }
-async function confWd(id){ if(!confirm('Confirm WD?')) return; const r=await post(`/api/admin/withdrawals/${id}/confirm`,{}); r.ok?(toast('✅ Confirmed'),loadWds('pending'),loadStats()):toast(r.error||'Error',false); }
-async function rejWd(id){ if(!confirm('Reject & Refund?')) return; const r=await post(`/api/admin/withdrawals/${id}/reject`,{}); r.ok?(toast('✅ Rejected'),loadWds('pending')):toast(r.error||'Error',false); }
+async function cdep(id){if(!confirm('Confirm?'))return;const r=await go(`/api/admin/deposits/${id}/confirm`,{});r.ok?(toast('✅ Confirmed'),ldep('pending'),lstat()):toast(r.error||'Err',false);}
+async function rdep(id){const reason=prompt('Reason:');const r=await go(`/api/admin/deposits/${id}/reject`,{reason});r.ok?(toast('❌ Rejected'),ldep('pending')):toast(r.error||'Err',false);}
 
-/* ── Users ─────────────────────────────────────────────── */
-async function searchUsers(){
-  const q=document.getElementById('userQ').value.trim();
-  document.getElementById('userList').innerHTML='<div class="ldr">ရှာနေသည်...</div>';
+async function lwd(st,el){
+  if(el){document.querySelectorAll('#wtabs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');}
+  document.getElementById('wdList').innerHTML='<div class="ldr">Loading...</div>';
+  const list=await get(`/api/admin/withdrawals?status=${st}`);
+  if(!list?.length){document.getElementById('wdList').innerHTML='<div class="ldr">မရှိသေးပါ</div>';return;}
+  document.getElementById('wdList').innerHTML=list.map(w=>`
+    <div class="row">
+      <div style="display:flex;justify-content:space-between;">
+        <div><div style="font-weight:700;font-size:13px;">${w.userName||w.userId} <span class="badge by2">${(w.paymentMethod||'').toUpperCase()}</span></div>
+        <div class="sub">💵 ${(w.amount||0).toLocaleString()} · 📱 ${w.kpayNumber||'—'} — ${w.kpayName||'—'}</div>
+        <div class="sub">🏦 ကျန်: ${(w.userBalance||0).toLocaleString()}</div></div>
+        <div class="sub">${new Date(w.createdAt).toLocaleDateString()}</div>
+      </div>
+      ${st==='pending'?`<div class="rbrow">
+        <button class="btn bg" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="cwd('${w._id}')">✅ Confirm</button>
+        <button class="btn br" style="margin-bottom:0;padding:6px 11px;font-size:11px;" onclick="rwd('${w._id}')">❌ Reject+Refund</button>
+      </div>`:''}
+    </div>`).join('');
+}
+async function cwd(id){if(!confirm('Confirm WD?'))return;const r=await go(`/api/admin/withdrawals/${id}/confirm`,{});r.ok?(toast('✅ Confirmed'),lwd('pending'),lstat()):toast(r.error||'Err',false);}
+async function rwd(id){if(!confirm('Reject & Refund?'))return;const r=await go(`/api/admin/withdrawals/${id}/reject`,{});r.ok?(toast('✅ Rejected'),lwd('pending')):toast(r.error||'Err',false);}
+
+async function lusr(){
+  const q=document.getElementById('uQ').value.trim();
+  document.getElementById('usrList').innerHTML='<div class="ldr">ရှာနေသည်...</div>';
   const d=await get(`/api/admin/users?search=${encodeURIComponent(q)}`);
-  if(!d?.users?.length){ document.getElementById('userList').innerHTML='<div class="ldr">မတွေ့ပါ</div>'; return; }
-  document.getElementById('userList').innerHTML = d.users.map(u=>`
+  if(!d?.users?.length){document.getElementById('usrList').innerHTML='<div class="ldr">မတွေ့ပါ</div>';return;}
+  document.getElementById('usrList').innerHTML=d.users.map(u=>`
     <div class="card" style="margin-bottom:7px;padding:12px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div>
-          <div style="font-weight:800;font-size:13px;">${u.firstName||u.username||'—'}
-            ${u.isBanned?'<span class="badge bg-red">BANNED</span>':''}
-            ${u.role==='agent'?'<span class="badge bg-grn">AGENT</span>':''}
-          </div>
-          <div class="sub">ID: ${u.telegramId} · @${u.username||'—'}</div>
-          <div class="sub">🎮 ${u.gamesPlayed||0} rounds · 🎰 Bet: ${(u.totalBet||0).toLocaleString()}</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-weight:800;color:#fcd34d;">${(u.balance||0).toLocaleString()}</div>
-          <div class="sub">MMK</div>
-        </div>
+        <div><div style="font-weight:800;font-size:13px;">${u.firstName||u.username||'—'} ${u.isBanned?'<span class="badge br2">BANNED</span>':''} ${u.role==='agent'?'<span class="badge bg2">AGENT</span>':''}</div>
+        <div class="sub">ID: ${u.telegramId} · @${u.username||'—'}</div>
+        <div class="sub">🎮 ${u.gamesPlayed||0} games</div></div>
+        <div style="text-align:right;"><div style="font-weight:800;color:#fcd34d;">${(u.balance||0).toLocaleString()}</div><div class="sub">MMK</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-        <button class="btn btn-ylw" style="padding:7px;font-size:11px;margin-bottom:0;" onclick="adjBal(${u.telegramId})">💰 Balance</button>
-        <button class="btn ${u.isBanned?'btn-grn':'btn-red'}" style="padding:7px;font-size:11px;margin-bottom:0;" onclick="banUser(${u.telegramId},${!u.isBanned})">${u.isBanned?'✅ Unban':'🚫 Ban'}</button>
-        <button class="btn ${u.role==='agent'?'btn-red':'btn-blu'}" style="padding:7px;font-size:11px;margin-bottom:0;grid-column:span 2;" onclick="setRole(${u.telegramId},'${u.role==='agent'?'user':'agent'}')">${u.role==='agent'?'Remove Agent':'🎯 Make Agent'}</button>
+        <button class="btn by" style="padding:7px;font-size:11px;margin-bottom:0;" onclick="adjBal(${u.telegramId})">💰 Balance</button>
+        <button class="btn ${u.isBanned?'bg':'br'}" style="padding:7px;font-size:11px;margin-bottom:0;" onclick="banU(${u.telegramId},${!u.isBanned})">${u.isBanned?'✅ Unban':'🚫 Ban'}</button>
+        <button class="btn ${u.role==='agent'?'br':'bb'}" style="padding:7px;font-size:11px;margin-bottom:0;grid-column:span 2;" onclick="setRole(${u.telegramId},'${u.role==='agent'?'user':'agent'}')">${u.role==='agent'?'Remove Agent':'🎯 Make Agent'}</button>
       </div>
     </div>`).join('');
 }
-async function adjBal(tid){ const amt=parseInt(prompt('Amount (+ or -):')); if(isNaN(amt)) return; const reason=prompt('Note:'); const r=await post(`/api/admin/users/${tid}/balance`,{amount:amt,reason}); r.ok?(toast(`✅ New: ${r.newBalance?.toLocaleString()}`),searchUsers()):toast(r.error||'Error',false); }
-async function banUser(tid,ban){ const r=await post(`/api/admin/users/${tid}/ban`,{ban}); r.ok?(toast(ban?'🚫 Banned':'✅ Unbanned'),searchUsers()):toast(r.error||'Error',false); }
-async function setRole(tid,role){ if(!confirm(`Role: ${role}?`)) return; const r=await post(`/api/admin/users/${tid}/role`,{role}); r.ok?(toast(`✅ Role: ${role}`),searchUsers()):toast(r.error||'Error',false); }
+async function adjBal(tid){const amt=parseInt(prompt('Amount (+/-):'));if(isNaN(amt))return;const reason=prompt('Note:')||'';const r=await go(`/api/admin/users/${tid}/balance`,{amount:amt,reason});r.ok?(toast(`✅ New: ${r.newBalance?.toLocaleString()}`),lusr()):toast(r.error||'Err',false);}
+async function banU(tid,ban){const r=await go(`/api/admin/users/${tid}/ban`,{ban});r.ok?(toast(ban?'🚫 Banned':'✅ Unbanned'),lusr()):toast(r.error||'Err',false);}
+async function setRole(tid,role){if(!confirm(`Role: ${role}?`))return;const r=await go(`/api/admin/users/${tid}/role`,{role});r.ok?(toast(`✅ ${role}`),lusr()):toast(r.error||'Err',false);}
 
-/* ── Agents ────────────────────────────────────────────── */
-async function loadAgents(){
-  document.getElementById('agentList').innerHTML='<div class="ldr">Loading...</div>';
+async function lag(){
+  document.getElementById('agList').innerHTML='<div class="ldr">Loading...</div>';
   const d=await get('/api/admin/agents');
-  if(!d?.agents?.length){ document.getElementById('agentList').innerHTML='<div class="ldr">Agent မရှိသေးပါ</div>'; return; }
-  document.getElementById('agentList').innerHTML = d.agents.map(a=>`
+  if(!d?.agents?.length){document.getElementById('agList').innerHTML='<div class="ldr">Agent မရှိသေးပါ</div>';return;}
+  document.getElementById('agList').innerHTML=d.agents.map(a=>`
     <div class="card" style="margin-bottom:7px;padding:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;">
-        <div>
-          <div style="font-weight:800;font-size:13px;">🎯 ${a.firstName||a.username||'Agent'}</div>
-          <div class="sub">ID: ${a.telegramId} · Referrals: ${a.referralCount||0}</div>
-          <div class="sub">DepComm: ${(a.agentData?.totalDepComm||0).toLocaleString()} | TurnComm: ${(a.agentData?.totalTurnComm||0).toLocaleString()}</div>
-          <div style="margin-top:5px;font-size:12px;">
-            <span class="badge bg-grn">Dep: ${a.agentData?.depositPct||0}%</span>
-            <span class="badge bg-ylw" style="margin-left:4px;">Turnover: ${a.agentData?.turnoverPct||0}%</span>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-weight:800;color:#fcd34d;">${(a.balance||0).toLocaleString()}</div>
-          <div class="sub">Balance</div>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div><div style="font-weight:800;font-size:13px;">🎯 ${a.firstName||a.username||'Agent'}</div>
+        <div class="sub">ID: ${a.telegramId} · Refs: ${a.referralCount||0}</div>
+        <div style="margin-top:5px;"><span class="badge bg2">Dep: ${a.agentData?.depositPct||0}%</span> <span class="badge by2" style="margin-left:3px;">Turn: ${a.agentData?.turnoverPct||0}%</span></div></div>
+        <div style="text-align:right;"><div style="font-weight:800;color:#fcd34d;">${(a.balance||0).toLocaleString()}</div><div class="sub">Balance</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
-        <button class="btn btn-ylw" style="padding:7px;font-size:10px;margin-bottom:0;" onclick="setCommission(${a.telegramId},${a.agentData?.depositPct||0},${a.agentData?.turnoverPct||0})">💹 %Set</button>
-        <button class="btn btn-blu"  style="padding:7px;font-size:10px;margin-bottom:0;" onclick="topupAgent(${a.telegramId})">💰 Topup</button>
-        <button class="btn btn-grey" style="padding:7px;font-size:10px;margin-bottom:0;" onclick="setKpay(${a.telegramId})">📱 KPay</button>
+        <button class="btn by" style="padding:7px;font-size:10px;margin-bottom:0;" onclick="setComm(${a.telegramId},${a.agentData?.depositPct||0},${a.agentData?.turnoverPct||0})">💹 %Set</button>
+        <button class="btn bb" style="padding:7px;font-size:10px;margin-bottom:0;" onclick="agTopup(${a.telegramId})">💰 Top</button>
+        <button class="btn bk" style="padding:7px;font-size:10px;margin-bottom:0;" onclick="setKpay(${a.telegramId})">📱 KPay</button>
       </div>
     </div>`).join('');
 }
-async function setCommission(tid,curDep,curTurn){
-  const dep=parseFloat(prompt(`Deposit Commission % (current: ${curDep}%):`));
-  if(isNaN(dep)) return;
-  const turn=parseFloat(prompt(`Turnover Commission % (current: ${curTurn}%):`));
-  if(isNaN(turn)) return;
-  const r=await post(`/api/admin/agents/${tid}/commission`,{depositPct:dep,turnoverPct:turn});
-  r.ok?(toast(`✅ Dep:${dep}% Turn:${turn}%`),loadAgents()):toast(r.error||'Error',false);
+async function setComm(tid,cd,ct){
+  const dep=parseFloat(prompt(`Deposit % (current: ${cd}%):`));if(isNaN(dep))return;
+  const turn=parseFloat(prompt(`Turnover % (current: ${ct}%):`));if(isNaN(turn))return;
+  const r=await go(`/api/admin/agents/${tid}/commission`,{depositPct:dep,turnoverPct:turn});
+  r.ok?(toast(`✅ Dep:${dep}% Turn:${turn}%`),lag()):toast(r.error||'Err',false);
 }
-async function topupAgent(tid){ const amt=parseInt(prompt('Amount (+/-):')); if(isNaN(amt)) return; const r=await post(`/api/admin/agents/${tid}/balance`,{amount:amt}); r.ok?(toast(`✅ Balance: ${r.newBalance?.toLocaleString()}`),loadAgents()):toast(r.error||'Error',false); }
-async function setKpay(tid){ const n=prompt('KPay Number:'); if(!n) return; const name=prompt('KPay Name:')||''; const wave=confirm('Wave Pay ပါ?'); const wn=wave?prompt('Wave Number:'):''; await post(`/api/admin/agents/${tid}/kpay`,{kpayNumber:n,kpayName:name,hasWave:wave,waveNumber:wn||''}); toast('✅ KPay Set ပြီ'); }
+async function agTopup(tid){const amt=parseInt(prompt('Amount (+/-):'));if(isNaN(amt))return;const r=await go(`/api/admin/agents/${tid}/balance`,{amount:amt});r.ok?(toast(`✅ Balance: ${r.newBalance?.toLocaleString()}`),lag()):toast(r.error||'Err',false);}
+async function setKpay(tid){const n=prompt('KPay Number:');if(!n)return;const name=prompt('KPay Name:')||'';const wave=confirm('Wave Pay ပါ?');const wn=wave?prompt('Wave Number:'):'';await go(`/api/admin/agents/${tid}/kpay`,{kpayNumber:n,kpayName:name,hasWave:wave,waveNumber:wn||''});toast('✅ KPay Set ပြီ');}
 
-/* ── Rounds ────────────────────────────────────────────── */
-async function loadRounds(){
-  const q=document.getElementById('roundQ').value.trim();
-  document.getElementById('roundList').innerHTML='<div class="ldr">Loading...</div>';
-  const url='/api/admin/users?search='+encodeURIComponent(q); // reuse user search for now
-  const d=await get(`/api/mines/history/${q||0}`).catch(()=>null);
-  // show raw stats from all games
-  document.getElementById('roundList').innerHTML='<div class="ldr">Admin game history API available via /api/mines/history/:id</div>';
-}
-
-/* ── Tools ─────────────────────────────────────────────── */
-async function toggleMaint(){ maint=!maint; const sw=document.getElementById('swMaint'); maint?sw.classList.add('on'):sw.classList.remove('on'); await post('/api/admin/maintenance',{enabled:maint}); toast(maint?'🔧 Maintenance ON':'✅ OFF'); }
-async function sendBroadcast(){ const message=document.getElementById('bMsg').value.trim(); if(!message) return toast('Message ထည့်ပါ',false); const buttonText=document.getElementById('bBtnTxt').value.trim(); const buttonUrl=document.getElementById('bBtnUrl').value.trim(); if(!confirm('Broadcast ပို့မည်?')) return; const r=await post('/api/admin/broadcast',{message,buttonText:buttonText||undefined,buttonUrl:buttonUrl||undefined}); r.ok?toast('📢 Broadcast started!'):toast(r.error||'Error',false); }
-async function createCode(){ const code=document.getElementById('rcCode').value.trim().toUpperCase(); const amount=parseInt(document.getElementById('rcAmt').value); const maxUses=parseInt(document.getElementById('rcMax').value)||1; if(!code||isNaN(amount)) return toast('Code+Amount ဖြည့်ပါ',false); const r=await post('/api/admin/redeem/create',{code,amount,maxUses}); r.ok?(toast(`✅ Code "${code}" ဖန်တီးပြီ`),loadCodes()):toast(r.error||'Error',false); }
-async function loadCodes(){ const list=await get('/api/admin/redeem'); const el=document.getElementById('codeList'); if(!list?.length){ el.innerHTML='<div class="ldr">Code မရှိသေးပါ</div>'; return; } el.innerHTML='<div style="margin-top:8px;">'+list.map(c=>`<div class="row"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-family:monospace;font-weight:800;font-size:12px;">${c.code}</div><div class="sub">💰 ${c.amount?.toLocaleString()} MMK · ${c.usedBy?.length||0}/${c.maxUses} uses</div></div><div style="display:flex;gap:4px;align-items:center;"><span class="badge ${c.isActive?'bg-grn':'bg-red'}">${c.isActive?'ON':'OFF'}</span><button style="background:rgba(239,68,68,.2);border:1px solid #ef4444;color:#fca5a5;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;" onclick="delCode('${c._id}')">Del</button></div></div></div>`).join('')+'</div>'; }
-async function delCode(id){ if(!confirm('ဖျက်မည်?')) return; const r=await fetch(API+'/api/admin/redeem/'+id,{method:'DELETE',headers:{'x-admin-id':aid}}); (await r.json()).ok?(toast('🗑️ Deleted'),loadCodes()):toast('Error',false); }
+async function toggleM(){maint=!maint;const sw=document.getElementById('swM');maint?sw.classList.add('on'):sw.classList.remove('on');await go('/api/admin/maintenance',{enabled:maint});toast(maint?'🔧 Maintenance ON':'✅ OFF');}
+async function broadcast(){const msg=document.getElementById('bMsg').value.trim();if(!msg)return toast('Message ထည့်ပါ',false);if(!confirm('ပို့မည်?'))return;const r=await go('/api/admin/broadcast',{message:msg,buttonText:document.getElementById('bBT').value.trim()||undefined,buttonUrl:document.getElementById('bBU').value.trim()||undefined});r.ok?toast('📢 Broadcast started!'):toast(r.error||'Err',false);}
+async function createCode(){const code=document.getElementById('rcC').value.trim().toUpperCase();const amount=parseInt(document.getElementById('rcA').value);const max=parseInt(document.getElementById('rcM').value)||1;if(!code||isNaN(amount))return toast('Code+Amount ဖြည့်ပါ',false);const r=await go('/api/admin/redeem/create',{code,amount,maxUses:max});r.ok?(toast(`✅ "${code}" ဖန်တီးပြီ`),lcodes()):toast(r.error||'Err',false);}
+async function lcodes(){const list=await get('/api/admin/redeem');const el=document.getElementById('codeList');if(!list?.length){el.innerHTML='<div class="ldr">Code မရှိသေးပါ</div>';return;}el.innerHTML='<div style="margin-top:8px;">'+list.map(c=>`<div class="row"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-family:monospace;font-weight:800;font-size:12px;">${c.code}</div><div class="sub">💰 ${c.amount?.toLocaleString()} MMK · ${c.usedBy?.length||0}/${c.maxUses} uses</div></div><span class="badge ${c.isActive?'bg2':'br2'}">${c.isActive?'ON':'OFF'}</span></div></div>`).join('')+'</div>';}
 
 init();
 </script>
