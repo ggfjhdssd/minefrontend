@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/play",  "destination": "/play.html"  },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/agent", "destination": "/agent.html" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Frame-Options",        "value": "ALLOWALL" },
+      { "key": "X-Content-Type-Options", "value": "nosniff"  },
+      { "key": "Cache-Control",          "value": "no-cache"  }
+    ]}
+  ]
+}
