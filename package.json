@@ -1,5 +1,8 @@
 {
   "name": "minefrontend",
   "version": "1.0.0",
-  "description": "Mines Game Frontend"
+  "description": "Mines Game Frontend",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  }
 }

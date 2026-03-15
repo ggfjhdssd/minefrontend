@@ -1,7 +1,14 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
+  "outputDirectory": ".",
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/play", "dest": "/play.html" },
+    { "src": "/agent", "dest": "/agent.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ],
   "headers": [
     {
