@@ -1,58 +1,14 @@
 {
-  "name": "minefrontend",
   "version": 2,
-  "builds": [
-    {
-      "src": "/*.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/play",
-      "dest": "/play.html"
-    },
-    {
-      "src": "/play.html",
-      "dest": "/play.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/admin.html"
-    },
-    {
-      "src": "/admin.html",
-      "dest": "/admin.html"
-    },
-    {
-      "src": "/agent",
-      "dest": "/agent.html"
-    },
-    {
-      "src": "/agent.html",
-      "dest": "/agent.html"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/$1" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self' https://*.telegram.org https://*.render.com https://cdn.tailwindcss.com https://cdn.socket.io https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.telegram.org https://cdn.tailwindcss.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.render.com https://minebackend-dyyq.onrender.com wss://minebackend-dyyq.onrender.com;"
-        }
+        { "key": "X-Frame-Options", "value": "ALLOWALL" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
   ]
