@@ -327,6 +327,19 @@ function mult(bombs, k) {
 /* ── Init ───────────────────────────────────────────────── */
 async function init() {
   try {
+    // Health check first
+    try {
+      const h = await fetch(API + '/health', { signal: AbortSignal.timeout(10000) });
+      const ht = await h.text();
+      const hj = JSON.parse(ht);
+      if (!hj.ok) throw new Error('Backend not ready');
+    } catch(he) {
+      return fatal('🔴 Backend ချိတ်ဆက်မရပါ<br>' +
+        '<small style="font-size:10px;color:#fca5a5;">URL: </small>' +
+        '<small style="font-family:monospace;font-size:10px;color:#fcd34d;word-break:break-all">' + API + '</small><br>' +
+        '<button onclick="location.href='index.html'" style="margin-top:10px;background:#f59e0b;border:none;color:#000;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">← ပြန်သွား</button>');
+    }
+
     const body = tg?.initDataUnsafe?.user ? {initData:tg.initData} : {telegramId:'12345'};
     const r = await post('/api/auth', body);
     if (!r.ok) return fatal(r.error||'Auth မအောင်မြင်ပါ');
