@@ -323,9 +323,24 @@ function setBalance(v){ G.balance = v; document.getElementById('balVal').textCon
 async function api(path, method='GET', body=null){
   const opts = { method, headers: { 'Content-Type':'application/json' } };
   if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(BACKEND + path, opts);
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error || 'Request failed');
+  let r;
+  try { r = await fetch(BACKEND + path, opts); }
+  catch(netErr) { throw new Error('Network error: ' + netErr.message); }
+
+  // Read raw text first — never blindly call .json()
+  const raw = await r.text();
+  console.log(`[API] ${method} ${path} → ${r.status}`, raw.slice(0, 300));
+
+  let d;
+  try { d = JSON.parse(raw); }
+  catch(_) {
+    // Server returned HTML or plain text instead of JSON
+    const preview = raw.slice(0, 120).replace(/\n/g,' ');
+    console.error('[API] Non-JSON response:', raw);
+    throw new Error(`Server error (${r.status}): ${preview}`);
+  }
+
+  if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
   return d;
 }
 
