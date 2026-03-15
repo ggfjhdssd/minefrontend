@@ -3,635 +3,782 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>💣 Mines — Play</title>
+<title>TicToeTic — ကစားမည်</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0a14;--sur:rgba(255,255,255,.045);--bdr:rgba(255,255,255,.08);
-  --acc:#f59e0b;--grn:#10b981;--red:#ef4444;--ylw:#f5b800;
-  --tx:#e8e8f0;--dim:rgba(255,255,255,.38);
+  --bg:#07070f;--sur:rgba(255,255,255,.042);--bdr:rgba(255,255,255,.075);
+  --acc:#5c35f5;--pk:#f54565;--grn:#00cc88;--blu:#3d9eff;--ylw:#f5b800;
+  --tx:#eaeaf2;--sub:rgba(255,255,255,.36);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--tx);}
+body{font-family:'Outfit',sans-serif;background:var(--bg);min-height:100vh;color:var(--tx);overflow-x:hidden;}
 
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-.orb1{position:absolute;width:450px;height:450px;border-radius:50%;top:-120px;left:-80px;
-  background:radial-gradient(circle,rgba(245,159,11,.11),transparent 70%);animation:d1 22s ease-in-out infinite alternate;}
-.orb2{position:absolute;width:350px;height:350px;border-radius:50%;bottom:-100px;right:-60px;
-  background:radial-gradient(circle,rgba(239,68,68,.08),transparent 70%);animation:d2 18s ease-in-out infinite alternate;}
-.grid-bg{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:36px 36px;}
-@keyframes d1{to{transform:translate(50px,35px)}} @keyframes d2{to{transform:translate(-40px,-28px)}}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.orb1{position:absolute;width:500px;height:500px;border-radius:50%;top:-100px;left:-80px;
+  background:radial-gradient(circle,rgba(92,53,245,.14) 0%,transparent 70%);
+  animation:o1 20s ease-in-out infinite alternate;}
+.orb2{position:absolute;width:400px;height:400px;border-radius:50%;bottom:-80px;right:-60px;
+  background:radial-gradient(circle,rgba(0,204,136,.09) 0%,transparent 70%);
+  animation:o2 16s ease-in-out infinite alternate;}
+@keyframes o1{0%{transform:translate(0,0)}100%{transform:translate(40px,30px)}}
+@keyframes o2{0%{transform:translate(0,0)}100%{transform:translate(-35px,-25px)}}
+.gbg{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:38px 38px;}
 
-#ldr{position:fixed;inset:0;background:var(--bg);z-index:999;
+/* Loader */
+#ldr{position:fixed;inset:0;background:var(--bg);z-index:1000;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
-.ldr-t{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);
+.ldr-t{font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,#a78bfa,#f472b6);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.spin{width:28px;height:28px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--acc);
-  border-radius:50%;animation:spin .8s linear infinite;}
+.ring{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:#7c5af5;
+  border-radius:50%;animation:spin .85s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:10px 12px 36px;display:none;}
-
-.card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;backdrop-filter:blur(16px);padding:16px;}
-.mb10{margin-bottom:10px;}
-
-/* Topbar */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.back{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:9px;cursor:pointer;display:flex;transition:.15s;}
-.back:active{transform:scale(.9);}
-
-/* Buttons */
-.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:13px;
-  font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;border:none;border-radius:13px;
-  color:#fff;cursor:pointer;transition:all .15s;}
-.btn:active{transform:scale(.96);}
-.btn:disabled{opacity:.45;cursor:default;transform:none;}
-.btn-play{background:linear-gradient(135deg,#d97706,#ef4444);box-shadow:0 6px 22px rgba(239,100,0,.3);}
-.btn-cash{background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 5px 18px rgba(16,185,129,.3);}
-.btn-home{background:rgba(255,255,255,.08);border:1px solid var(--bdr);}
-
-/* Input */
-.inp-lbl{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
-.inp{width:100%;padding:11px 13px;background:rgba(0,0,0,.25);border:1.5px solid var(--bdr);
-  border-radius:11px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;outline:none;transition:.2s;}
-.inp:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(245,159,11,.13);}
-.inp::placeholder{color:rgba(255,255,255,.18);font-weight:400;}
-
-/* Bet presets */
-.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px;}
-.preset{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;
-  padding:8px 4px;font-size:11px;font-weight:700;cursor:pointer;color:var(--tx);text-align:center;transition:.13s;}
-.preset:active,.preset.sel{background:rgba(245,159,11,.2);border-color:var(--acc);color:#fcd34d;}
-
-/* Bomb slider */
-.bomb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:8px;font-size:12px;font-weight:700;}
-.b-bomb{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.3);color:#fca5a5;}
-.b-gem{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
-input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:4px;background:rgba(255,255,255,.1);outline:none;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,#d97706,#ef4444);box-shadow:0 2px 8px rgba(239,100,0,.4);cursor:pointer;}
-
-/* Multiplier preview */
-.mult-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:0;}
-.mp{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:8px;text-align:center;}
-.mp-v{font-size:12px;font-weight:800;color:#fcd34d;}
-.mp-l{font-size:9px;color:var(--dim);margin-top:1px;}
-
-/* Active game — multiplier display */
-.mult-hero{text-align:center;padding:12px 0 6px;}
-.mult-lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
-.mult-val{font-size:3.2rem;font-weight:900;letter-spacing:-.02em;line-height:1;
-  background:linear-gradient(135deg,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  transition:all .22s;}
-.mult-val.bump{animation:bump .28s cubic-bezier(.16,1,.3,1);}
-@keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
-.payout-val{font-size:.9rem;font-weight:700;color:var(--grn);}
-
-/* Game info row */
-.ginfo{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px;}
-.gi{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:8px;text-align:center;}
-.gi-v{font-size:13px;font-weight:800;}
-.gi-l{font-size:9px;color:var(--dim);text-transform:uppercase;margin-top:2px;}
-
-/* ── 5×5 GRID ── */
-#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0;}
-.cell{aspect-ratio:1;border-radius:9px;border:1.5px solid rgba(255,255,255,.09);
-  background:rgba(255,255,255,.055);display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;cursor:pointer;user-select:none;position:relative;overflow:hidden;transition:all .13s;}
-.cell:not(.hit):not(.safe):not(.dis):hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.28);transform:scale(1.06);}
-.cell:not(.hit):not(.safe):not(.dis):active{transform:scale(.91);}
-.cell.dis{cursor:default;}
-/* Safe = gem */
-.cell.safe{background:rgba(16,185,129,.17);border-color:rgba(16,185,129,.45);cursor:default;
-  animation:pop .22s cubic-bezier(.16,1,.3,1);}
-@keyframes pop{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
-/* Bomb hit */
-.cell.hit{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.5);cursor:default;
-  animation:boom .3s cubic-bezier(.16,1,.3,1);}
-@keyframes boom{0%{transform:scale(0)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
-/* Revealed bomb (not the one clicked) */
-.cell.revealed-bomb{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.28);cursor:default;}
-/* Pending reveal */
-.cell.pending{opacity:.5;}
-
-/* Provably Fair box */
-.pf-box{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px;margin-top:9px;}
-.pf-title{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:4px;}
-.pf-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px;}
-.pf-k{font-size:10px;color:var(--dim);flex-shrink:0;padding-top:1px;}
-.pf-v{font-family:monospace;font-size:9.5px;color:#fcd34d;word-break:break-all;text-align:right;
-  background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;flex:1;}
-.verify-ok{color:#6ee7b7;font-size:11px;font-weight:700;}
-.verify-no{color:#fca5a5;font-size:11px;font-weight:700;}
-
 /* Result overlay */
-#resOv{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);
-  display:none;align-items:center;justify-content:center;z-index:200;}
-.res-card{background:linear-gradient(135deg,rgba(14,10,32,.98),rgba(24,14,48,.98));
-  border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:28px 22px;
-  text-align:center;max-width:320px;width:92%;animation:resIn .38s cubic-bezier(.16,1,.3,1);}
-@keyframes resIn{from{opacity:0;transform:translateY(28px) scale(.94)}to{opacity:1;transform:none}}
+#resOv{position:fixed;inset:0;background:rgba(0,0,0,.82);
+  display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(8px);}
+.res-card{background:linear-gradient(135deg,rgba(18,12,45,.96),rgba(28,16,60,.96));
+  border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:30px 22px;
+  text-align:center;max-width:300px;width:90%;
+  animation:resIn .42s cubic-bezier(.16,1,.3,1);}
+@keyframes resIn{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 .res-em{font-size:3.8rem;margin-bottom:8px;}
-.res-title{font-size:1.55rem;font-weight:900;letter-spacing:-.02em;margin-bottom:4px;}
-.res-payout{font-size:2.1rem;font-weight:900;margin-bottom:3px;}
-.res-sub{font-size:12px;color:var(--dim);margin-bottom:16px;line-height:1.6;}
+.res-tit{font-size:1.5rem;font-weight:900;letter-spacing:-.02em;margin-bottom:5px;}
+.res-sub{font-size:.85rem;color:var(--sub);margin-bottom:22px;line-height:1.5;}
 .res-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
 
+/* Main wrap */
+#wrap{position:relative;z-index:1;max-width:435px;margin:0 auto;padding:11px 12px 32px;display:none;}
+
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;backdrop-filter:blur(18px);}
+.p4{padding:16px;}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+.back-btn{background:var(--sur);border:1px solid var(--bdr);border-radius:10px;
+  padding:9px;cursor:pointer;display:flex;transition:.16s;}
+.back-btn:active{transform:scale(.9);}
+
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;
+  font-family:'Outfit',sans-serif;font-weight:700;border:none;cursor:pointer;
+  border-radius:13px;padding:12px;width:100%;color:#fff;transition:all .16s;font-size:14px;}
+.btn:active{transform:scale(.96);}
+.btn-play{background:linear-gradient(135deg,#5c35f5,#9333ea);box-shadow:0 5px 20px rgba(92,53,245,.3);}
+.btn-grn{background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 4px 12px rgba(16,185,129,.2);}
+.btn-red{background:linear-gradient(135deg,#be123c,#ef4444);box-shadow:0 4px 12px rgba(239,68,68,.2);}
+
+/* Player badges */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:100px;
+  font-size:12px;font-weight:700;}
+.b-x{background:rgba(61,158,255,.15);border:1px solid rgba(61,158,255,.3);color:#93c5fd;}
+.b-o{background:rgba(245,69,101,.15);border:1px solid rgba(245,69,101,.3);color:#fca5a5;}
+.b-grn{background:rgba(0,204,136,.15);border:1px solid rgba(0,204,136,.3);color:#6ee7b7;}
+.b-ylw{background:rgba(245,184,0,.15);border:1px solid rgba(245,184,0,.3);color:#fde68a;}
+.b-pur{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#c4b5fd;}
+
+/* Timer ring */
+.t-ring{position:relative;width:72px;height:72px;margin:0 auto;}
+.t-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
+.t-track{stroke:rgba(255,255,255,.07);fill:none;stroke-width:5;}
+.t-fill{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:201;
+  stroke-dashoffset:0;transition:stroke-dashoffset .85s linear,stroke .4s;}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:1.45rem;font-weight:900;}
+
+/* Board */
+#board{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:9px;}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:900;border-radius:8px;cursor:pointer;
+  background:rgba(255,255,255,.035);border:1.5px solid rgba(255,255,255,.08);
+  transition:all .14s;user-select:none;}
+.cell:not(.taken):not(.dis):hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);transform:scale(1.05);}
+.cell:not(.taken):not(.dis):active{transform:scale(.93);}
+.cell.taken{cursor:default;}
+.cell.dis{cursor:not-allowed;}
+.cell.my{border-color:rgba(245,184,0,.3);}
+.cell.cx{color:#60a5fa;background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.35);text-shadow:0 0 10px rgba(59,130,246,.5);}
+.cell.co{color:#f87171;background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.35);text-shadow:0 0 10px rgba(239,68,68,.5);}
+.cell.wf{animation:wf .5s ease infinite alternate;}
+@keyframes wf{from{transform:scale(1)}to{transform:scale(1.08);box-shadow:0 0 18px currentColor;}}
+@keyframes popIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.pp{animation:popIn .22s ease-out;}
+
+/* Search loader */
+.sring{width:52px;height:52px;border:4px solid rgba(255,255,255,.07);border-top-color:var(--acc);
+  border-radius:50%;animation:spin .9s linear infinite;margin:0 auto;}
+
+/* Dots */
+.dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#a78bfa;margin:0 2px;
+  animation:da 1.4s infinite;}
+.dots span:nth-child(2){animation-delay:.2s;}
+.dots span:nth-child(3){animation-delay:.4s;}
+@keyframes da{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-5px);opacity:1}}
+
 /* Toast */
-#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-70px);
-  z-index:9999;transition:all .36s cubic-bezier(.68,-.55,.265,1.55);opacity:0;pointer-events:none;}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-70px);
+  z-index:9999;transition:all .38s cubic-bezier(.68,-.55,.265,1.55);opacity:0;pointer-events:none;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 .ti{padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;
-  backdrop-filter:blur(20px);display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
-.t-ok{background:rgba(16,185,129,.9);border:1px solid #34d399;color:#fff;}
-.t-err{background:rgba(239,68,68,.9);border:1px solid #f87171;color:#fff;}
+  backdrop-filter:blur(20px);display:flex;align-items:center;gap:7px;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.tok{background:rgba(0,204,136,.88);border:1px solid #34d399;color:#fff;}
+.terr{background:rgba(239,68,68,.88);border:1px solid #f87171;color:#fff;}
 
-/* Confetti */
-@keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(520deg);opacity:0}}
-.conf{position:fixed;pointer-events:none;border-radius:2px;animation:fall linear forwards;z-index:9999;}
+/* ✅ NEW: Emote System */
+.emote-wrap{position:relative;display:inline-flex;align-items:center;}
+.emote-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px;color:var(--sub);
+  transition:all .15s;white-space:nowrap;line-height:1;}
+.emote-btn:active{transform:scale(.9);background:rgba(255,255,255,.16);}
+.emote-popup{position:absolute;top:calc(100% + 8px);left:0;z-index:500;
+  background:rgba(18,12,40,.97);border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:6px;min-width:172px;
+  box-shadow:0 12px 32px rgba(0,0,0,.55);
+  animation:epIn .18s cubic-bezier(.16,1,.3,1);display:none;}
+.emote-popup.open{display:block;}
+@keyframes epIn{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+.emote-item{padding:9px 13px;border-radius:10px;cursor:pointer;font-size:13px;
+  font-weight:600;color:var(--tx);transition:background .12s;white-space:nowrap;}
+.emote-item:hover,.emote-item:active{background:rgba(255,255,255,.1);}
+
+/* Speech bubble */
+#emoteBubble{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) scale(0);
+  background:linear-gradient(135deg,rgba(92,53,245,.92),rgba(147,51,234,.92));
+  border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:10px 20px;
+  font-size:15px;font-weight:700;color:#fff;z-index:9000;pointer-events:none;
+  box-shadow:0 8px 24px rgba(92,53,245,.4);text-align:center;max-width:280px;
+  transition:transform .28s cubic-bezier(.16,1,.3,1),opacity .28s;}
+#emoteBubble.show{transform:translateX(-50%) scale(1);}
+#emoteBubble.hide{transform:translateX(-50%) scale(0);opacity:0;}
+.eb-name{font-size:10px;font-weight:600;opacity:.7;margin-bottom:2px;}
 </style>
 </head>
 <body>
-<div class="bg"><div class="orb1"></div><div class="orb2"></div><div class="grid-bg"></div></div>
-<div id="ldr"><div class="ldr-t">💣 Mines</div><div class="spin"></div></div>
-<div id="toast"><div class="ti" id="tmsg"></div></div>
+<div class="bg"><div class="orb1"></div><div class="orb2"></div><div class="gbg"></div></div>
+<div id="ldr"><div class="ldr-t">🎮 TicToeTic</div><div class="ring"></div></div>
+<div id="toast"><div class="ti" id="ti"></div></div>
 
-<!-- Result overlay -->
+<!-- Result Overlay -->
 <div id="resOv">
   <div class="res-card">
-    <div class="res-em" id="rEm"></div>
-    <div class="res-title" id="rTitle"></div>
-    <div class="res-payout" id="rPayout"></div>
-    <div class="res-sub"   id="rSub"></div>
-    <!-- Provably Fair result -->
-    <div class="pf-box" style="margin-bottom:16px;text-align:left;">
-      <div class="pf-title">🔐 Provably Fair — စစ်ဆေးပါ</div>
-      <div class="pf-row"><div class="pf-k">Server Seed</div><div class="pf-v" id="rfSeed">—</div></div>
-      <div class="pf-row"><div class="pf-k">Client Seed</div><div class="pf-v" id="rfClient">—</div></div>
-      <div class="pf-row"><div class="pf-k">SHA-256 Hash</div><div class="pf-v" id="rfHash">—</div></div>
-      <div class="pf-row"><div class="pf-k">ဗုံးနေရာ</div><div class="pf-v" id="rfBombs">—</div></div>
-      <div id="rfVerify" style="margin-top:5px;"></div>
-    </div>
+    <div class="res-em" id="rEm">🏆</div>
+    <div class="res-tit" id="rTit"></div>
+    <div class="res-sub" id="rSub"></div>
     <div class="res-btns">
-      <button class="btn btn-play" onclick="newGame()">🔄 ထပ်ကစား</button>
-      <button class="btn btn-home" onclick="goHome()">🏠 ထွက်</button>
+      <button class="btn btn-grn" onclick="playAgain()">🔄 ထပ်ကစား</button>
+      <button class="btn btn-red" onclick="goHome()">🏠 ထွက်</button>
     </div>
   </div>
 </div>
 
 <div id="wrap">
+
   <!-- Topbar -->
   <div class="topbar">
-    <button class="back" onclick="goHome()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    <button class="back-btn" onclick="goHome()">
+      <svg width="18" height="18" fill="none" stroke="var(--tx)" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
     </button>
-    <div style="font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">💣 Mines</div>
+    <div style="font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,#a78bfa,#f472b6);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;">🎮 TicToeTic</div>
     <div style="text-align:right;">
-      <div style="font-size:9px;color:var(--dim);">လက်ကျန်</div>
-      <div id="topBal" style="font-weight:800;color:#fcd34d;font-size:.95rem;">0 MMK</div>
+      <div style="font-size:10px;color:var(--sub);">လက်ကျန်</div>
+      <div style="font-weight:800;color:var(--grn);font-size:.95rem;" id="topBal">0 MMK</div>
     </div>
   </div>
 
-  <!-- ═══ SETUP CARD (shown before game starts) ═══ -->
-  <div class="card mb10" id="setupCard">
+  <!-- Game card -->
+  <div class="card p4">
 
-    <!-- Bet Amount -->
-    <div style="margin-bottom:12px;">
-      <div class="inp-lbl">💰 လောင်းကြေး (ကျပ်)</div>
-      <div class="presets">
-        <div class="preset" onclick="setBet(1000,this)">1,000</div>
-        <div class="preset" onclick="setBet(2000,this)">2,000</div>
-        <div class="preset" onclick="setBet(3000,this)">3,000</div>
-        <div class="preset sel" onclick="setBet(5000,this)">5,000</div>
-      </div>
-      <input class="inp" id="betInp" type="number" value="1000" min="1000" max="5000"
-        placeholder="1,000 – 5,000 ကျပ်" oninput="onBetChange()">
-      <div style="font-size:10px;color:var(--dim);margin-top:4px;">Min: 1,000 · Max: 5,000 ကျပ်</div>
-    </div>
-
-    <!-- Bomb Count -->
-    <div style="margin-bottom:13px;">
-      <div class="bomb-row">
-        <div class="inp-lbl">💣 ဗုံးအရေအတွက်</div>
-        <div style="display:flex;gap:6px;">
-          <span class="badge b-bomb" id="bombBadge">3 💣</span>
-          <span class="badge b-gem"  id="gemBadge">22 💵</span>
-        </div>
-      </div>
-      <input type="range" id="bombSlider" min="1" max="24" value="3" oninput="onBombChange()">
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:3px;"><span>1 ဗုံး</span><span>24 ဗုံး</span></div>
-    </div>
-
-    <!-- Multiplier preview -->
-    <div style="margin-bottom:13px;">
-      <div class="inp-lbl" style="margin-bottom:7px;">📈 အဆ Preview (RTP 95%)</div>
-      <div class="mult-preview">
-        <div class="mp"><div class="mp-v" id="p1">—</div><div class="mp-l">1 💵</div></div>
-        <div class="mp"><div class="mp-v" id="p3">—</div><div class="mp-l">3 💵</div></div>
-        <div class="mp"><div class="mp-v" id="p5">—</div><div class="mp-l">5 💵</div></div>
-        <div class="mp"><div class="mp-v" id="p8">—</div><div class="mp-l">8 💵</div></div>
-        <div class="mp"><div class="mp-v" id="p12">—</div><div class="mp-l">12 💵</div></div>
-        <div class="mp"><div class="mp-v" id="p20">—</div><div class="mp-l">20 💵</div></div>
-      </div>
-    </div>
-
-    <!-- Client seed (optional) -->
-    <details style="margin-bottom:13px;">
-      <summary style="font-size:11px;font-weight:700;color:var(--dim);cursor:pointer;user-select:none;text-transform:uppercase;letter-spacing:.05em;">🔐 Provably Fair / Client Seed</summary>
-      <div style="margin-top:8px;">
-        <input class="inp" id="clientSeed" placeholder="ကိုယ်ပိုင် seed (မထည့်ရင် Telegram ID သုံးမည်)" style="font-size:13px;">
-        <div style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.6;">
-          ဂိမ်းမစမီ Server Seed ၏ SHA-256 ကို ကြိုပြမည်။<br>
-          ဂိမ်းပြီးမှ Original Seed စစ်ဆေးနိုင်သည်။
-        </div>
-        <div id="preHashDiv" style="display:none;margin-top:8px;">
-          <div class="pf-box">
-            <div class="pf-title">⏳ Server Seed Hash (game မပြီးမီ)</div>
-            <div class="pf-v" id="preHash" style="word-break:break-all;text-align:left;"></div>
+    <!-- IDLE -->
+    <div id="sIdle">
+      <div style="text-align:center;padding:22px 0;">
+        <div style="font-size:3.2rem;margin-bottom:12px;">🎮</div>
+        <div style="font-size:1.25rem;font-weight:900;margin-bottom:6px;">ကစားရန် အသင့်ဖြစ်ပြီ</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:20px;">ကစားသူ တစ်ဦးနှင့် တွဲကစားနိုင်သည်</div>
+        <div style="background:rgba(0,0,0,.18);border:1px solid var(--bdr);border-radius:13px;
+          padding:15px;margin-bottom:20px;text-align:left;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:9px;">
+            <span style="color:var(--sub);">ဝင်ကြေး</span><span style="font-weight:700;">500 MMK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:9px;">
+            <span style="color:var(--sub);">နိုင်ရင် ရမည်</span><span style="font-weight:700;color:var(--grn);">900 MMK</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:var(--sub);">သရေကျလျှင်</span><span style="font-weight:700;color:var(--blu);">450 MMK ပြန်ရ</span>
           </div>
         </div>
-      </div>
-    </details>
-
-    <button class="btn btn-play" id="startBtn" onclick="startGame()">💣 Play Now</button>
-  </div>
-
-  <!-- ═══ ACTIVE GAME CARD ═══ -->
-  <div class="card mb10" id="gameCard" style="display:none;">
-
-    <!-- Multiplier hero -->
-    <div class="mult-hero">
-      <div class="mult-lbl">လက်ရှိ အဆ</div>
-      <div class="mult-val" id="multVal">1.00×</div>
-      <div style="font-size:12px;color:var(--dim);margin-top:2px;">
-        ထုတ်ယူနိုင်: <span class="payout-val" id="payoutVal">0 ကျပ်</span>
+        <button class="btn btn-play" onclick="startSearch()">🎮 PLAY (500 MMK)</button>
       </div>
     </div>
 
-    <!-- Game info -->
-    <div class="ginfo">
-      <div class="gi"><div class="gi-v" id="gBet" style="color:#fcd34d;">—</div><div class="gi-l">Bet</div></div>
-      <div class="gi"><div class="gi-v" id="gRevealed" style="color:var(--grn);">0</div><div class="gi-l">ဖွင့်ပြီး</div></div>
-      <div class="gi"><div class="gi-v" id="gBombs" style="color:#fca5a5;">—</div><div class="gi-l">ဗုံး</div></div>
+    <!-- SEARCHING -->
+    <div id="sSearch" style="display:none;">
+      <div style="text-align:center;padding:26px 0;">
+        <div class="sring" style="margin-bottom:18px;"></div>
+        <div style="font-size:1.15rem;font-weight:900;margin-bottom:8px;">ကစားသူ ရှာနေသည်</div>
+        <div class="dots" style="margin-bottom:14px;"><span></span><span></span><span></span></div>
+        <div class="badge b-ylw" style="margin:0 auto 20px;display:inline-flex;">
+          ⏱ <span id="sSec">60</span> စက္ကန့်
+        </div>
+        <button class="btn btn-red" style="max-width:170px;margin:0 auto;" onclick="cancelSearch()">❌ ပယ်ဖျက်မည်</button>
+      </div>
     </div>
 
-    <!-- 5×5 Grid -->
-    <div id="grid"></div>
+    <!-- PLAYING -->
+    <div id="sPlay" style="display:none;">
 
-    <!-- Cash Out Button -->
-    <button class="btn btn-cash mb10" id="cashBtn" onclick="doCashOut()" disabled>
-      💰 Cash Out — 0 ကျပ်
-    </button>
+      <!-- Player row ✅ CHANGED: added emote button -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;">
+          <div class="badge b-x" id="p1b" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✖ <span id="p1n">You</span></div>
+          <!-- Emote trigger -->
+          <div class="emote-wrap" id="emoteWrap">
+            <button class="emote-btn" id="emoteBtn" onclick="toggleEmoteMenu(event)">💬</button>
+            <div class="emote-popup" id="emotePopup">
+              <div class="emote-item" onclick="sendEmote('😝 သနားတယ်')">😝 သနားတယ်</div>
+              <div class="emote-item" onclick="sendEmote('😂 ဟဟဘဲရမယ်')">😂 ဟဟဘဲရမယ်</div>
+              <div class="emote-item" onclick="sendEmote('🥺 မလုပ်ပါနဲ့')">🥺 မလုပ်ပါနဲ့</div>
+              <div class="emote-item" onclick="sendEmote('🫡 စောက်တောသား')">🫡 စောက်တောသား</div>
+              <div class="emote-item" onclick="sendEmote('🖕 ဘောဘဲ')">🖕 ဘောဘဲ</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:.8rem;font-weight:800;color:rgba(255,255,255,.25);padding:0 6px;">VS</div>
+        <div class="badge b-o" id="p2b" style="flex-shrink:0;">⭕ <span id="p2n">ကစားသူ</span></div>
+      </div>
 
-    <!-- In-game provably fair preview -->
-    <div class="pf-box">
-      <div class="pf-title">🔐 Provably Fair</div>
-      <div class="pf-row"><div class="pf-k">Server Hash</div><div class="pf-v" id="gamePfHash" style="font-size:9px;">—</div></div>
-      <div style="font-size:10px;color:var(--dim);">ဂိမ်းပြီးမှ Original Seed စစ်ဆေးနိုင်မည်</div>
+      <!-- Turn badge -->
+      <div style="text-align:center;margin-bottom:11px;">
+        <div class="badge b-grn" id="turnB" style="display:inline-flex;">🎯 သင့်လှည့်</div>
+      </div>
+
+      <!-- Timer -->
+      <div class="t-ring" style="margin-bottom:11px;">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="32" class="t-track"/>
+          <circle cx="36" cy="36" r="32" class="t-fill" id="tFill" stroke="#f5b800"/>
+        </svg>
+        <div class="t-num" id="tNum">10</div>
+      </div>
+
+      <!-- Board -->
+      <div id="board"></div>
+
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.2);margin-top:5px;">
+        ⚔️ 4 ကွက်တန်းလျှင် အနိုင်ရသည်
+      </div>
     </div>
+
+  </div><!-- /card -->
+
+  <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.18);margin-top:10px;">
+    ⏱ 10 စက္ကန့် • ✖ ⭕ 4 ကွက်တန်း • 🏆 900 MMK
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════ */
-const API  = 'https://minebackend-dyyq.onrender.com';
-const N    = 25;   // 5×5 grid
-const RTP  = 0.95;
-const tg   = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor?.('#0a0a14'); tg.setBackgroundColor?.('#0a0a14'); }
+const tg=window.Telegram?.WebApp;
+if(tg){tg.expand();tg.ready();}
 
-let me       = null;
-let game     = null;  // { gameId, betAmount, bombCount, serverSeedHash, clientSeed, revealed:Set }
-let busy     = false;
-/* ═══════════════════════════════════════════════════════ */
+const API='https://tiktocbackend-zktq.onrender.com';
+const TURN_S=10;
 
-/* ── Toast ──────────────────────────────────────────────── */
-function toast(msg, ok=true) {
-  const el=document.getElementById('toast'), t=document.getElementById('tmsg');
-  t.textContent=msg; t.className='ti '+(ok?'t-ok':'t-err');
-  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2400);
+let socket=null,user=null,gameId=null,mySymbol=null;
+let isMyTurn=false,turnTimer=null,searchTimer=null;
+let searchLeft=60,turnLeft=TURN_S; // ✅ CHANGED: 30 → 60
+let board=newBoard(),toastT;
+
+function newBoard(){return Array(5).fill(null).map(()=>Array(5).fill(''));}
+
+/* ── toast ── */
+function toast(msg,ok=true,dur=3200){
+  const el=document.getElementById('toast'),ti=document.getElementById('ti');
+  ti.textContent=(ok?'✅ ':'⚠️ ')+msg;ti.className='ti '+(ok?'tok':'terr');
+  el.classList.add('show');clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),dur);
 }
 
-/* ── Multiplier math (mirrors backend) ─────────────────── */
-function mult(bombs, k) {
-  if (k===0) return 1;
-  const safe=N-bombs; let p=1;
-  for (let i=0;i<k;i++) p*=(safe-i)/(N-i);
-  return parseFloat(((1/p)*RTP).toFixed(4));
-}
-
-/* ── Init ───────────────────────────────────────────────── */
-async function init() {
-  try {
-    const body = tg?.initDataUnsafe?.user ? {initData:tg.initData} : {telegramId:'12345'};
-    const r = await post('/api/auth', body);
-    if (!r.ok) return fatal(r.error||'Auth မအောင်မြင်ပါ');
-    me = r;
-    document.getElementById('topBal').textContent = fmt(me.balance) + ' MMK';
-
-    // Check for existing active game (page reload resume)
-    const ar = await get(`/api/mines/active/${me.telegramId}`);
-    if (ar?.active) {
-      game = {
-        gameId:          ar.gameId,
-        betAmount:       ar.betAmount,
-        bombCount:       ar.bombCount,
-        serverSeedHash:  ar.serverSeedHash,
-        clientSeed:      ar.clientSeed,
-        revealed:        new Set(ar.revealedTiles||[])
-      };
-      openGameCard();
-      renderGrid(game.revealed, new Set());
-      updateMult(game.revealed.size, game.bombCount, game.betAmount);
-      toast('⚡ ဂိမ်း ပြန်ချိတ်ပြီ');
+/* ── init: fix User123 bug — use sessionStorage as identity cache ── */
+async function init(){
+  try{
+    const initData=tg?.initData||'';
+    const savedId=sessionStorage.getItem('uid');
+    let body;
+    if(initData){
+      body={initData};
+    }else if(savedId){
+      const r2=await fetch(`${API}/api/user/${savedId}`);
+      const d2=await r2.json();
+      if(d2.balance!==undefined){
+        user={telegramId:parseInt(savedId),firstName:d2.firstName,username:d2.username,...d2};
+        document.getElementById('topBal').textContent=`${(user.balance||0).toLocaleString()} MMK`;
+        hideLdr();
+        checkAutoJoin();return;
+      }
+      body={telegramId:parseInt(savedId)};
+    }else{
+      body={telegramId:12345};
     }
-
-    updatePreview();
+    const r=await fetch(`${API}/api/auth`,{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(r.status);
+    user=await r.json();
+    if(user.telegramId)sessionStorage.setItem('uid',user.telegramId);
+    document.getElementById('topBal').textContent=`${(user.balance||0).toLocaleString()} MMK`;
     hideLdr();
-  } catch(e) { fatal(e.message); }
+    checkAutoJoin();
+  }catch(e){
+    console.error('init:',e);
+    hideLdr();
+    toast('ဆာဗာ ချိတ်ဆက်မှု ပြဿနာ',false,5000);
+  }
 }
 
-function fmt(n) { return (n||0).toLocaleString(); }
+function checkAutoJoin(){
+  const p=new URLSearchParams(window.location.search);
+  const joinId=p.get('join');
+  if(joinId&&user) startSearch(joinId);
+}
+
 function hideLdr(){
-  const l=document.getElementById('ldr'); l.style.opacity='0';
-  setTimeout(()=>{l.style.display='none'; document.getElementById('wrap').style.display='block';},300);
+  const l=document.getElementById('ldr');l.style.opacity='0';l.style.transition='opacity .3s';
+  setTimeout(()=>{l.style.display='none';document.getElementById('wrap').style.display='block';},280);
 }
-function fatal(m){ document.getElementById('ldr').innerHTML=`<div style="font-size:2rem">⚠️</div><div style="color:#fca5a5;font-size:14px;max-width:250px;text-align:center;">${m}</div><button onclick="goHome()" style="margin-top:12px;background:#ef4444;border:none;color:#fff;padding:9px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;">← ပြန်</button>`; }
 
-/* ── Setup controls ─────────────────────────────────────── */
-function setBet(v, el) {
-  document.getElementById('betInp').value = v;
-  document.querySelectorAll('.preset').forEach(b=>b.classList.remove('sel'));
-  el?.classList.add('sel');
-  updatePreview();
+function goHome(){
+  if(socket){socket.disconnect();socket=null;}
+  window.location.href='/index.html';
 }
-function onBetChange() {
-  document.querySelectorAll('.preset').forEach(b=>b.classList.remove('sel'));
-  updatePreview();
-}
-function onBombChange() {
-  const b = parseInt(document.getElementById('bombSlider').value);
-  document.getElementById('bombBadge').textContent = b + ' 💣';
-  document.getElementById('gemBadge').textContent  = (N-b) + ' 💵';
-  updatePreview();
-}
-function updatePreview() {
-  const bombs = parseInt(document.getElementById('bombSlider').value)||3;
-  const safe  = N - bombs;
-  const bet   = parseInt(document.getElementById('betInp').value)||1000;
-  [[1,'p1'],[3,'p3'],[5,'p5'],[8,'p8'],[12,'p12'],[20,'p20']].forEach(([k,id])=>{
-    const el = document.getElementById(id);
-    if (k > safe) { el.textContent='—'; return; }
-    const m = mult(bombs,k);
-    el.textContent = m.toFixed(2)+'×';
-  });
-}
-onBombChange();
 
-/* ── Start game ─────────────────────────────────────────── */
-async function startGame() {
-  if (busy) return;
-  const bet   = parseInt(document.getElementById('betInp').value);
-  const bombs = parseInt(document.getElementById('bombSlider').value);
-  const cSeed = document.getElementById('clientSeed')?.value.trim()||'';
-
-  if (isNaN(bet)||bet<1000||bet>5000) return toast('1,000–5,000 ကျပ် ဖြစ်ရမည်',false);
-  if (bet > (me?.balance||0))         return toast('လက်ကျန် မလောက်ပါ',false);
-
-  busy=true;
-  const btn = document.getElementById('startBtn');
-  btn.disabled=true; btn.textContent='⏳ စတင်နေသည်...';
-
-  const r = await post('/api/mines/start', {
-    telegramId: me.telegramId, betAmount: bet, bombCount: bombs,
-    clientSeed: cSeed||undefined
+/* ── Socket ── */
+function connectSocket(joinId){
+  if(socket?.connected)return;
+  socket=io(API,{
+    query:joinId?{join:joinId}:{},
+    transports:['websocket','polling'],
+    reconnection:true,reconnectionAttempts:5,timeout:12000
   });
 
-  if (!r.ok) {
-    toast(r.error||'ဂိမ်း မစနိုင်ပါ', false);
-    btn.disabled=false; btn.textContent='💣 Play Now'; busy=false; return;
-  }
+  socket.on('connect',()=>console.log('✅ socket'));
 
-  me.balance = r.newBalance;
-  document.getElementById('topBal').textContent = fmt(r.newBalance)+' MMK';
+  socket.on('connect_error',(e)=>{
+    console.error('socket err:',e.message);
+    showState('idle');
+    toast('ချိတ်ဆက်မှု ပြဿနာ: '+e.message,false,5000);
+  });
 
-  game = { gameId:r.gameId, betAmount:bet, bombCount:bombs,
-           serverSeedHash:r.serverSeedHash, clientSeed:r.clientSeed, revealed:new Set() };
+  socket.on('error',(d)=>{
+    const msg=typeof d==='string'?d:d?.msg||'Error';
+    // FIX: Only go to idle state if NOT currently in a game
+    // During gameplay, only show toast — do NOT reset the board
+    if (!gameId) {
+      stopSearchTimer();showState('idle');
+    }
+    toast(msg,false,5000);
+  });
 
-  // Show hash before game
-  document.getElementById('preHash').textContent = r.serverSeedHash;
-  document.getElementById('preHashDiv').style.display = 'block';
+  socket.on('insufficientBalance',(d)=>{
+    stopSearchTimer();showState('idle');
+    toast(`လက်ကျန်ငွေ မလုံလောက်ပါ — ကျန်: ${(d?.balance||0).toLocaleString()} MMK (500 MMK လိုသည်)`,false,5000);
+  });
 
-  openGameCard();
-  renderGrid(new Set(), new Set());
-  updateMult(0, bombs, bet);
-  busy=false;
-}
+  socket.on('waitingForPlayer',({gameId:gid})=>{
+    gameId=gid;
+    startSearchTimer();
+  });
 
-/* ── Grid render ────────────────────────────────────────── */
-function renderGrid(safeSet, bombSet) {
-  const el = document.getElementById('grid');
-  el.innerHTML='';
-  for (let i=0;i<N;i++){
-    const c = document.createElement('div');
-    c.dataset.i = i;
-    if (safeSet.has(i))  { c.className='cell safe dis'; c.textContent='💵'; }
-    else if (bombSet.has(i)) { c.className='cell revealed-bomb dis'; c.textContent='💣'; }
-    else { c.className='cell'; c.onclick=()=>revealCell(i); }
-    el.appendChild(c);
-  }
-}
+  socket.on('gameStarted',(data)=>{
+    stopSearchTimer();
+    gameId=data.gameId;
+    board=data.board||newBoard();
+    mySymbol=data.mySymbol;
+    isMyTurn=data.currentTurn===user.telegramId;
 
-function cell(i){ return document.querySelector(`.cell[data-i="${i}"]`); }
-function lockGrid(){ document.querySelectorAll('.cell:not(.safe):not(.hit):not(.revealed-bomb)').forEach(c=>{c.onclick=null;c.classList.add('dis');}); }
+    // Set player name labels — never reveal AI
+    const names=data.players||{};
+    const myName=names[user.telegramId]||'You';
+    const oppId=Object.keys(names).find(k=>parseInt(k)!==user.telegramId);
+    const oppName=oppId?names[oppId]:'ကစားသူ';
 
-/* ── Reveal cell ────────────────────────────────────────── */
-async function revealCell(i) {
-  if (!game||busy) return;
-  const c = cell(i);
-  if (!c || c.classList.contains('safe')||c.classList.contains('hit')) return;
-
-  busy=true;
-  c.classList.add('pending');
-
-  const r = await post('/api/mines/reveal', { gameId:game.gameId, tileIndex:i, telegramId:me.telegramId });
-  c.classList.remove('pending');
-
-  if (!r.ok) { toast(r.error||'Error',false); busy=false; return; }
-
-  if (r.result==='gem') {
-    c.className='cell safe dis'; c.textContent='💵';
-    game.revealed.add(i);
-
-    if (r.autoWin) {
-      // All safe tiles revealed → auto cashout
-      lockGrid();
-      me.balance = r.newBalance;
-      document.getElementById('topBal').textContent = fmt(r.newBalance)+' MMK';
-      showBombs(r.bombPositions, new Set());
-      setTimeout(()=>showResult(true, r.payout, r.multiplier, r.serverSeed, r.clientSeed, r.serverSeedHash, r.bombPositions), 400);
-      busy=false; return;
+    if(mySymbol==='X'){
+      document.getElementById('p1n').textContent=myName;
+      document.getElementById('p2n').textContent=oppName;
+    }else{
+      document.getElementById('p1n').textContent=oppName;
+      document.getElementById('p2n').textContent=myName;
+      document.getElementById('p1b').className='badge b-x';
+      document.getElementById('p2b').className='badge b-o';
     }
 
-    updateMult(game.revealed.size, game.bombCount, game.betAmount, r.multiplier, r.payout);
+    buildBoard();showState('play');updateTurnUI();startTurnTimer();
 
-  } else {
-    // BOMB HIT
-    c.className='cell hit dis'; c.textContent='💣';
-    lockGrid();
-    await delay(320);
-    showBombs(r.bombPositions, new Set([i]));
-    me.balance = r.newBalance;
-    document.getElementById('topBal').textContent = fmt(r.newBalance)+' MMK';
-    await delay(700);
-    showResult(false, 0, 0, r.serverSeed, r.clientSeed, r.serverSeedHash, r.bombPositions);
-  }
-  busy=false;
-}
+    // ── Haptic feedback: Mobile Legends style 3-second strong pulse ──
+    try {
+      if (tg?.HapticFeedback) {
+        // notificationOccurred('success') + rapid heavy impacts for 3 seconds
+        // Pattern: success → heavy × 2 → success → heavy × 2 → ... every 200ms
+        const hapticSequence=[
+          {t:0,   fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:200, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:400, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:600, fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:800, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1000,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1200,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:1400,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1600,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1800,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:2000,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2200,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2400,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:2600,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2800,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+        ];
+        hapticSequence.forEach(({t,fn})=>setTimeout(()=>{try{fn();}catch(e){}},t));
+      } else if (navigator.vibrate) {
+        // Fallback: continuous 3-second vibration
+        navigator.vibrate(3000);
+      }
+    } catch(e) { /* haptic not supported */ }
+  });
 
-/* ── Cash Out ───────────────────────────────────────────── */
-async function doCashOut() {
-  if (!game||busy||game.revealed.size===0) return;
-  busy=true;
-  lockGrid();
-  document.getElementById('cashBtn').disabled=true;
-  document.getElementById('cashBtn').textContent='⏳ ထုတ်နေသည်...';
+  socket.on('gameResumed',(data)=>{
+    stopSearchTimer();
+    gameId=data.gameId;mySymbol=data.mySymbol;
+    board=data.board||newBoard();
+    isMyTurn=data.currentTurn===user.telegramId;
+    const names=data.players||{};
+    const myName=names[user.telegramId]||'You';
+    const oppId=Object.keys(names).find(k=>parseInt(k)!==user.telegramId);
+    const oppName=oppId?names[oppId]:'ကစားသူ';
+    if(mySymbol==='X'){
+      document.getElementById('p1n').textContent=myName;
+      document.getElementById('p2n').textContent=oppName;
+      document.getElementById('p1b').className='badge b-x';
+      document.getElementById('p2b').className='badge b-o';
+    } else {
+      // FIX: p1 = X player (opponent), p2 = O player (me)
+      document.getElementById('p1n').textContent=oppName;
+      document.getElementById('p2n').textContent=myName;
+      document.getElementById('p1b').className='badge b-x';
+      document.getElementById('p2b').className='badge b-o';
+    }
+    buildBoard();showState('play');updateTurnUI();startTurnTimer();
 
-  const r = await post('/api/mines/cashout', { gameId:game.gameId, telegramId:me.telegramId });
-  if (!r.ok) { toast(r.error||'Error',false); busy=false; return; }
+    // ── Haptic feedback: Mobile Legends style 3-second strong pulse ──
+    try {
+      if (tg?.HapticFeedback) {
+        // notificationOccurred('success') + rapid heavy impacts for 3 seconds
+        // Pattern: success → heavy × 2 → success → heavy × 2 → ... every 200ms
+        const hapticSequence=[
+          {t:0,   fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:200, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:400, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:600, fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:800, fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1000,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1200,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:1400,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1600,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:1800,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:2000,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2200,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2400,fn:()=>tg.HapticFeedback.notificationOccurred('success')},
+          {t:2600,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+          {t:2800,fn:()=>tg.HapticFeedback.impactOccurred('heavy')},
+        ];
+        hapticSequence.forEach(({t,fn})=>setTimeout(()=>{try{fn();}catch(e){}},t));
+      } else if (navigator.vibrate) {
+        // Fallback: continuous 3-second vibration
+        navigator.vibrate(3000);
+      }
+    } catch(e) { /* haptic not supported */ }
+  });
 
-  me.balance = r.newBalance;
-  document.getElementById('topBal').textContent = fmt(r.newBalance)+' MMK';
-  showBombs(r.bombPositions, new Set());
-  await delay(500);
-  showResult(true, r.payout, r.multiplier, r.serverSeed, r.clientSeed, r.serverSeedHash, r.bombPositions);
-  busy=false;
-}
+  socket.on('moveMade',(data)=>{
+    board=data.board;
+    // FIX: server now always sends currentTurn; gameEnded=true means no next turn
+    if(!data.gameEnded){
+      isMyTurn = (data.currentTurn !== null && data.currentTurn !== undefined)
+                   ? data.currentTurn===user.telegramId
+                   : false;
+      updateBoard(data.row,data.col,data.symbol);
+      updateTurnUI();
+      resetTurnTimer();
+    } else {
+      // Winning/draw move: just render the cell, timers stop on gameOver
+      isMyTurn=false;
+      updateBoard(data.row,data.col,data.symbol);
+      updateTurnUI();
+      stopTurnTimer();
+    }
+  });
 
-function showBombs(positions, skip) {
-  if (!positions) return;
-  positions.forEach(i=>{
-    if (skip.has(i)) return;
-    const c=cell(i);
-    if (c && !c.classList.contains('safe') && !c.classList.contains('hit'))
-      { c.className='cell revealed-bomb dis'; c.textContent='💣'; }
+  socket.on('turnChanged',(data)=>{
+    isMyTurn=data.currentTurn===user.telegramId;
+    updateTurnUI();resetTurnTimer();
+  });
+
+  socket.on('gameOver',(data)=>{
+    stopTurnTimer();
+    board=data.board;
+    refreshAllCells();
+    const endedGameId = gameId;
+    gameId = null; // FIX: clear gameId so error handler won't block idle state on next search
+    mySymbol = null;
+    setTimeout(()=>{showResult(data.winner,data.reason);refreshBal();},700);
+  });
+
+  // ✅ CHANGED: opponentDisconnected now just a placeholder (instant loss on backend)
+  socket.on('opponentDisconnected',()=>{
+    stopTurnTimer();
+    const b=document.getElementById('turnB');
+    b.className='badge b-ylw';b.textContent='⌛ ကစားသူ ထွက်သွားသည်...';
+  });
+
+  // ✅ NEW: Receive emote
+  socket.on('emoteReceived',({senderId, emote})=>{
+    const names = {};
+    // resolve display name from current player name elements
+    const isMine = senderId === user?.telegramId;
+    const senderName = isMine
+      ? (document.getElementById('p1n')?.textContent || 'You')
+      : (document.getElementById('p2n')?.textContent || 'ကစားသူ');
+    showEmoteBubble(isMine ? '😤 You' : `💬 ${senderName}`, emote);
+  });
+
+  socket.on('searchTimeout',()=>{stopSearchTimer();showState('idle');});
+  socket.on('searchCancelled',()=>{stopSearchTimer();showState('idle');});
+
+  // ── FIX: Handle fake disconnect (sabotage AI triggers this) ──
+  socket.on('fakeDisconnect',(data)=>{
+    stopTurnTimer();
+    const b=document.getElementById('turnB');
+    if(b){ b.className='badge b-ylw'; b.textContent='📶 ချိတ်ဆက်မှု ပြဿနာ...'; }
+    // Disable all board cells
+    document.querySelectorAll('.cell').forEach(c=>{ c.classList.add('dis'); c.classList.remove('my'); });
+    toast(data?.message || '📶 ချိတ်ဆက်မှု ကျသွားသည်...', false, 8000);
   });
 }
 
-/* ── Multiplier display ─────────────────────────────────── */
-function updateMult(revealed, bombs, bet, serverMult, serverPayout) {
-  const m = serverMult || mult(bombs, revealed);
-  const p = serverPayout !== undefined ? serverPayout : Math.floor(bet * m);
-  const el = document.getElementById('multVal');
-  el.textContent = m.toFixed(2)+'×';
-  el.classList.remove('bump'); void el.offsetWidth; if(revealed>0) el.classList.add('bump');
-  document.getElementById('payoutVal').textContent = fmt(p)+' ကျပ်';
-  document.getElementById('gRevealed').textContent = revealed;
-  const cash = document.getElementById('cashBtn');
-  cash.disabled = (revealed===0);
-  cash.textContent = `💰 Cash Out — ${fmt(p)} ကျပ်`;
+/* ── States ── */
+function showState(s){
+  document.getElementById('sIdle').style.display=s==='idle'?'block':'none';
+  document.getElementById('sSearch').style.display=s==='search'?'block':'none';
+  document.getElementById('sPlay').style.display=s==='play'?'block':'none';
 }
 
-function openGameCard() {
-  document.getElementById('setupCard').style.display='none';
-  document.getElementById('gameCard').style.display='block';
-  document.getElementById('gamePfHash').textContent = game.serverSeedHash||'—';
-  document.getElementById('gBet').textContent   = fmt(game.betAmount);
-  document.getElementById('gBombs').textContent = game.bombCount+' 💣';
-  buildEmptyGrid();
+/* ── Search ── */
+async function startSearch(joinId){
+  if(!user){toast('Login ဝင်ပါ',false);return;}
+  // FIX: always fetch fresh balance before checking — avoids stale/string balance bugs
+  await refreshBal();
+  if(Number(user.balance)<500){
+    toast('လက်ကျန်ငွေ မလုံလောက်ပါ (500 MMK လိုသည်)',false,4000);return;
+  }
+  connectSocket(joinId);
+  showState('search');
+  searchLeft=60; // ✅ CHANGED
+  document.getElementById('sSec').textContent=60;
+  socket.emit('findGame',{userId:user.telegramId});
 }
 
-function buildEmptyGrid() {
-  const el=document.getElementById('grid'); el.innerHTML='';
-  for(let i=0;i<N;i++){
-    const c=document.createElement('div');
-    c.className='cell'; c.dataset.i=i; c.onclick=()=>revealCell(i);
-    el.appendChild(c);
+function cancelSearch(){
+  socket?.emit('cancelSearch',{userId:user?.telegramId});
+  stopSearchTimer();showState('idle');
+}
+
+function startSearchTimer(){
+  clearInterval(searchTimer);searchLeft=60; // ✅ CHANGED
+  searchTimer=setInterval(()=>{
+    searchLeft--;document.getElementById('sSec').textContent=searchLeft;
+    if(searchLeft<=0){clearInterval(searchTimer);}
+  },1000);
+}
+function stopSearchTimer(){clearInterval(searchTimer);}
+
+/* ── Board ── */
+function buildBoard(){
+  const el=document.getElementById('board');
+  el.innerHTML='';
+  for(let r=0;r<5;r++){
+    for(let c=0;c<5;c++){
+      const d=document.createElement('div');
+      d.className='cell';d.id=`c${r}${c}`;
+      d.dataset.r=r;d.dataset.c=c;
+      d.addEventListener('click',()=>makeMove(r,c));
+      const v=board[r][c];
+      if(v){d.textContent=v==='X'?'✖':'⭕';d.classList.add('taken',v==='X'?'cx':'co');}
+      el.appendChild(d);
+    }
+  }
+  updateInteract();
+}
+
+function updateBoard(row,col,sym){
+  const cell=document.getElementById(`c${row}${col}`);
+  if(!cell)return;
+  // Always render — don't skip if 'taken' already set (opponent move may not have rendered yet)
+  cell.textContent=sym==='X'?'✖':'⭕';
+  cell.classList.remove('cx','co','my','dis');
+  cell.classList.add('taken',sym==='X'?'cx':'co','pp');
+  updateInteract();
+}
+
+function refreshAllCells(){
+  for(let r=0;r<5;r++){
+    for(let c=0;c<5;c++){
+      const v=board[r][c];
+      const cell=document.getElementById(`c${r}${c}`);
+      if(!cell)continue;
+      if(v&&!cell.classList.contains('taken')){
+        cell.textContent=v==='X'?'✖':'⭕';
+        cell.classList.add('taken',v==='X'?'cx':'co','pp');
+      }
+    }
   }
 }
 
-/* ── Result Overlay ─────────────────────────────────────── */
-function showResult(won, payout, multiplier, serverSeed, clientSeed, hash, bombPositions) {
-  document.getElementById('rEm').textContent     = won ? '💰' : '💣';
-  document.getElementById('rTitle').textContent  = won ? 'Cash Out အောင်မြင်!' : 'ဗုံးထိပြီ!';
-  document.getElementById('rTitle').style.color  = won ? '#6ee7b7' : '#fca5a5';
-  document.getElementById('rPayout').textContent = won
-    ? `+${fmt(payout)} ကျပ် (${(multiplier||0).toFixed(2)}×)`
-    : `-${fmt(game?.betAmount||0)} ကျပ်`;
-  document.getElementById('rPayout').style.background = won
-    ? 'linear-gradient(135deg,#fcd34d,#f59e0b)' : 'linear-gradient(135deg,#fca5a5,#ef4444)';
-  document.getElementById('rPayout').style['-webkit-background-clip']='text';
-  document.getElementById('rPayout').style['-webkit-text-fill-color']='transparent';
-  document.getElementById('rSub').textContent = won
-    ? `💵 ${game?.revealed?.size||0} ကွက် ဖွင့်ပြီး Cash Out!`
-    : `💣 ဗုံး ${game?.bombCount||0} လုံးပါ Grid ပေါ်မှ ထိမိ`;
-
-  // Provably fair
-  document.getElementById('rfSeed').textContent   = serverSeed || '—';
-  document.getElementById('rfClient').textContent = clientSeed  || '—';
-  document.getElementById('rfHash').textContent   = hash        || '—';
-  document.getElementById('rfBombs').textContent  = bombPositions ? [...bombPositions].sort((a,b)=>a-b).join(', ') : '—';
-
-  // Client-side SHA-256 verify
-  if (serverSeed && hash) {
-    (async()=>{
-      try {
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(serverSeed));
-        const hex = [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
-        document.getElementById('rfVerify').innerHTML = hex===hash
-          ? '<div class="verify-ok">✅ Hash စစ်ဆေးမှု အောင်မြင် — ဗုံးနေရာ ကြိုတင်သတ်မှတ်ထားကြောင်း သက်သေပြပြီ</div>'
-          : '<div class="verify-no">❌ Hash မကိုက်ညီ</div>';
-      } catch {}
-    })();
-  }
-
-  document.getElementById('resOv').style.display='flex';
-  if (won) confetti();
-  game=null;
+function updateInteract(){
+  document.querySelectorAll('.cell').forEach(c=>{
+    if(c.classList.contains('taken')){c.classList.add('dis');c.classList.remove('my');}
+    else if(isMyTurn){c.classList.remove('dis');c.classList.add('my');}
+    else{c.classList.add('dis');c.classList.remove('my');}
+  });
 }
 
-/* ── Confetti ───────────────────────────────────────────── */
-function confetti(){
-  const colors=['#f59e0b','#ef4444','#10b981','#3b82f6','#a78bfa','#f472b6'];
-  for(let i=0;i<55;i++){
-    const el=document.createElement('div');
-    el.className='conf';
-    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[~~(Math.random()*colors.length)]};
-      width:${6+Math.random()*7}px;height:${6+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};
-      animation-duration:${1.6+Math.random()*2}s;animation-delay:${Math.random()*.5}s;`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),3500);
-  }
+function makeMove(r,c){
+  if(!isMyTurn||!gameId||!socket?.connected)return;
+  const cell=document.getElementById(`c${r}${c}`);
+  if(cell?.classList.contains('taken'))return;
+  isMyTurn=false;updateInteract();
+  socket.emit('makeMove',{gameId,row:r,col:c});
 }
 
-/* ── Nav ────────────────────────────────────────────────── */
-function newGame() {
+/* ── Timer ── */
+function startTurnTimer(){
+  turnLeft=TURN_S;updateTimerUI(TURN_S);
+  stopTurnTimer();
+  turnTimer=setInterval(()=>{
+    turnLeft--;updateTimerUI(turnLeft);
+    if(turnLeft<=0)stopTurnTimer();
+  },1000);
+}
+function resetTurnTimer(){stopTurnTimer();startTurnTimer();}
+function stopTurnTimer(){clearInterval(turnTimer);}
+
+function updateTimerUI(val){
+  const num=document.getElementById('tNum');
+  const fill=document.getElementById('tFill');
+  if(!num||!fill)return;
+  const v=Math.max(0,val);
+  num.textContent=v;
+  const pct=v/TURN_S;
+  fill.style.strokeDashoffset=201*(1-pct);
+  if(v<=3){fill.style.stroke='#ef4444';num.style.color='#f87171';}
+  else if(v<=6){fill.style.stroke='#f97316';num.style.color='#fb923c';}
+  else{fill.style.stroke='#f5b800';num.style.color='';}
+}
+
+/* ── Turn UI ── */
+function updateTurnUI(){
+  const b=document.getElementById('turnB');
+  if(isMyTurn){b.className='badge b-grn';b.textContent='🎯 သင့်လှည့်';}
+  else{
+    b.className='badge b-pur';
+    b.innerHTML='<div class="dots"><span></span><span></span><span></span></div> ကစားသူ၏ လှည့်';
+  }
+  updateInteract();
+}
+
+/* ── Result ── */
+function showResult(winner,reason){
+  const ov=document.getElementById('resOv');
+  const em=document.getElementById('rEm');
+  const tit=document.getElementById('rTit');
+  const sub=document.getElementById('rSub');
+
+  if(winner===user.telegramId){
+    em.textContent='🏆';tit.textContent='အနိုင်ရပြီ!';tit.style.color='#4ade80';
+    sub.textContent='ဆုကြေး +900 MMK ရရှိပြီ!';
+  }else if(winner===-1){
+    em.textContent='🤝';tit.textContent='သရေကျပြီ!';tit.style.color='#60a5fa';
+    sub.textContent='+450 MMK ပြန်ရပြီ';
+  }else{
+    em.textContent='😔';tit.textContent='ရှုံးပြီ';tit.style.color='#f87171';
+    sub.textContent=reason==='timeout'?'⏱ အချိန်ကုန်သွားသည်':
+                   reason==='disconnect'?'ကစားသူ ထွက်သွားသည်':'ထပ်ကြိုးစားပါ!';
+  }
+  ov.style.display='flex';
+}
+
+function playAgain(){
   document.getElementById('resOv').style.display='none';
-  document.getElementById('gameCard').style.display='none';
-  document.getElementById('setupCard').style.display='block';
-  document.getElementById('startBtn').disabled=false;
-  document.getElementById('startBtn').textContent='💣 Play Now';
-  document.getElementById('preHashDiv').style.display='none';
-  document.getElementById('topBal').textContent=fmt(me?.balance||0)+' MMK';
-  updatePreview();
-  busy=false;
-}
-function goHome(){ location.href='index.html'; }
-
-/* ── Helpers ────────────────────────────────────────────── */
-const delay = ms => new Promise(r=>setTimeout(r,ms));
-async function post(path,body){
-  try{ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return r.json(); }
-  catch(e){ return {error:e.message}; }
-}
-async function get(path){
-  try{ return (await fetch(API+path)).json(); } catch{ return null; }
+  if(socket){socket.disconnect();socket=null;}
+  gameId=null;mySymbol=null;isMyTurn=false;board=newBoard();
+  // FIX: refresh balance first so stale "insufficient funds" doesn't block play
+  refreshBal().then(()=>{ showState('idle'); });
 }
 
-init();
+async function refreshBal(){
+  if(!user?.telegramId)return;
+  try{
+    const r=await fetch(`${API}/api/user/${user.telegramId}`);
+    const d=await r.json();
+    if(d.balance!==undefined){
+      // FIX: always store as Number — avoids "5000" > 1000 = false type-coercion bug
+      user.balance=Number(d.balance);
+      document.getElementById('topBal').textContent=`${user.balance.toLocaleString()} MMK`;
+    }
+  }catch(e){}
+}
+
+
+// ✅ NEW: Emote System
+let emoteTimeout = null;
+
+function toggleEmoteMenu(e){
+  e.stopPropagation();
+  const popup = document.getElementById('emotePopup');
+  popup.classList.toggle('open');
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('emotePopup')?.classList.remove('open');
+});
+
+function sendEmote(emote){
+  if(!socket?.connected || !gameId) return;
+  document.getElementById('emotePopup').classList.remove('open');
+  socket.emit('sendEmote', { gameId, emote });
+}
+
+function showEmoteBubble(name, emote){
+  const el = document.getElementById('emoteBubble');
+  const nameEl = document.getElementById('ebName');
+  const textEl = document.getElementById('ebText');
+  if(!el) return;
+  nameEl.textContent = name || '';
+  textEl.textContent = emote;
+  clearTimeout(emoteTimeout);
+  el.classList.remove('hide');
+  el.classList.add('show');
+  emoteTimeout = setTimeout(() => {
+    el.classList.add('hide');
+    el.classList.remove('show');
+  }, 2800);
+}
+
+window.addEventListener('DOMContentLoaded',init);
 </script>
+<div id="emoteBubble"><div class="eb-name" id="ebName"></div><div id="ebText"></div></div>
 </body>
 </html>
