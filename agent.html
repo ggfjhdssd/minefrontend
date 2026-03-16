@@ -9,126 +9,151 @@
 <style>
 :root{
   --bg:#08080f;--sur:#111118;--sur2:#16161f;
-  --bdr:rgba(255,255,255,.07);--bdr2:rgba(255,255,255,.13);
+  --bdr:rgba(255,255,255,.07);
   --acc:#7c3aed;--pk:#f54565;--grn:#00cc88;--blu:#3d9eff;--ylw:#f5b800;
   --tx:#eaeaf2;--sub:rgba(255,255,255,.32);
-  --nav-h:64px;--safe-b:env(safe-area-inset-bottom,0px);
+  --nav-h:62px;--safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;max-width:480px;margin:0 auto;}
 .amb{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 15% 0%,rgba(124,58,237,.13) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 85% 100%,rgba(0,204,136,.09) 0%,transparent 60%);}
-#ldr{position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);}
+#ldr{position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);transition:opacity .3s;}
 .ldr-icon{font-size:3rem;animation:pulse 1.4s ease-in-out infinite;}
 @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
 .ldr-title{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#00cc88,#3d9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .ring{width:26px;height:26px;border-radius:50%;border:2.5px solid rgba(255,255,255,.1);border-top-color:#00cc88;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 #errSc{position:fixed;inset:0;z-index:700;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:28px;background:var(--bg);}
-.es-icon{font-size:3.5rem;}.es-title{font-size:1.15rem;font-weight:800;}.es-sub{font-size:13px;color:var(--sub);max-width:270px;line-height:1.7;}
 #shell{position:relative;z-index:1;display:none;flex-direction:column;height:100%;overflow:hidden;}
-.hdr{flex-shrink:0;display:flex;align-items:center;gap:11px;padding:12px 16px 10px;background:var(--sur);border-bottom:1px solid var(--bdr);backdrop-filter:blur(20px);}
+.hdr{flex-shrink:0;display:flex;align-items:center;gap:11px;padding:12px 16px 10px;background:var(--sur);border-bottom:1px solid var(--bdr);}
 .hdr-av{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#00cc88);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
-.hdr-info{flex:1;min-width:0;}.hdr-name{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.hdr-role{font-size:10px;color:var(--grn);font-weight:700;margin-top:1px;}
-.hdr-bal{flex-shrink:0;text-align:right;}.hdr-bal-amt{font-weight:900;font-size:1.05rem;color:var(--grn);line-height:1;}.hdr-bal-lbl{font-size:10px;color:var(--sub);margin-top:2px;}
+.hdr-name{font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-role{font-size:10px;color:var(--grn);font-weight:700;margin-top:1px;}
+.hdr-bal-amt{font-weight:900;font-size:1.05rem;color:var(--grn);line-height:1;}
+.hdr-bal-lbl{font-size:10px;color:var(--sub);margin-top:2px;text-align:right;}
 .sbar{flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bdr);border-bottom:1px solid var(--bdr);}
-.sb-it{background:var(--sur);padding:8px 4px;text-align:center;}.sb-val{font-size:1rem;font-weight:900;line-height:1;}.sb-lbl{font-size:9px;color:var(--sub);margin-top:2px;white-space:nowrap;}
+.sb-it{background:var(--sur);padding:8px 4px;text-align:center;}
+.sb-val{font-size:1rem;font-weight:900;line-height:1;}
+.sb-lbl{font-size:9px;color:var(--sub);margin-top:2px;white-space:nowrap;}
 .pages{flex:1;overflow:hidden;position:relative;}
 .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px calc(var(--nav-h) + var(--safe-b) + 8px);display:none;}
 .page.active{display:block;}
 .bnav{flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h);padding-bottom:var(--safe-b);background:var(--sur);border-top:1px solid var(--bdr);}
 .bn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--sub);border:none;background:none;font-family:'Outfit',sans-serif;position:relative;transition:color .15s;}
 .bn.on{color:var(--acc);}
-.bn-ic{font-size:1.3rem;line-height:1;}.bn-lb{font-size:9px;font-weight:700;}
-.bn-dot{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--acc);opacity:0;transition:opacity .15s;}
+.bn-ic{font-size:1.25rem;line-height:1;}.bn-lb{font-size:9px;font-weight:700;}
+.bn-dot{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--acc);opacity:0;transition:.15s;}
 .bn.on .bn-dot{opacity:1;}
 .bn-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--pk);color:#fff;font-size:9px;font-weight:900;border-radius:99px;padding:1px 5px;min-width:16px;text-align:center;display:none;}
 .bn-badge.on{display:block;}
-.sec{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 1px;}
-.sec-t{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;}.sec-s{font-size:11px;color:var(--sub);}
+.ftabs{display:flex;gap:5px;margin-bottom:10px;}
+.ftab{flex:1;padding:7px 4px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid var(--bdr);background:rgba(255,255,255,.04);color:var(--sub);cursor:pointer;text-align:center;transition:.15s;}
+.ftab.on-p{background:rgba(245,184,0,.12);border-color:rgba(245,184,0,.3);color:var(--ylw);}
+.ftab.on-c{background:rgba(0,204,136,.12);border-color:rgba(0,204,136,.3);color:var(--grn);}
+.ftab.on-r{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.3);color:var(--pk);}
+.sec{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-t{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;}
 .card{background:var(--sur2);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px;}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:'Outfit',sans-serif;font-weight:700;border:none;cursor:pointer;border-radius:10px;padding:10px 14px;color:#fff;font-size:12px;transition:opacity .12s,transform .1s;user-select:none;}
-.btn:active:not(:disabled){transform:scale(.96);}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
-.btn-f{width:100%;}.btn-grn{background:linear-gradient(135deg,#059669,#10b981);}.btn-red{background:rgba(220,38,38,.85);}
-.btn-blu{background:linear-gradient(135deg,#1d4ed8,#3b82f6);}.btn-pur{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:'Outfit',sans-serif;font-weight:700;border:none;cursor:pointer;border-radius:10px;padding:10px 14px;color:#fff;font-size:12px;transition:.1s;user-select:none;}
+.btn:active:not(:disabled){transform:scale(.96);}.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-f{width:100%;}
+.btn-grn{background:linear-gradient(135deg,#059669,#10b981);}
+.btn-red{background:rgba(220,38,38,.85);}
+.btn-pur{background:linear-gradient(135deg,#7c3aed,#a855f7);}
 .btn-gh{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);}
 .btn-sm{padding:7px 11px;font-size:11px;border-radius:8px;}
-.bsp{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .6s linear infinite;display:none;}
-.empty{display:flex;flex-direction:column;align-items:center;padding:30px 16px;gap:8px;text-align:center;}
-.ei{font-size:2.2rem;opacity:.5;}.et{font-size:13px;color:var(--sub);line-height:1.6;}
-.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:rgba(12,12,22,.96);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 20px;font-size:13px;font-weight:700;z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .25s;backdrop-filter:blur(20px);white-space:pre-line;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;opacity:0;pointer-events:none;}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-.t-ok{border-color:rgba(0,204,136,.4);color:#00cc88;}.t-err{border-color:rgba(244,63,94,.4);color:#f87171;}.t-info{border-color:rgba(61,158,255,.4);color:#3d9eff;}
-/* Commission card */
 .comm-card{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(0,204,136,.07));border:1px solid rgba(124,58,237,.2);border-radius:14px;padding:16px;margin-bottom:10px;}
 .comm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .comm-item{background:rgba(0,0,0,.25);border:1px solid var(--bdr);border-radius:11px;padding:14px;text-align:center;}
 .comm-pct{font-size:2rem;font-weight:900;line-height:1;}
 .comm-pct.dep{background:linear-gradient(135deg,#f5b800,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .comm-pct.tur{background:linear-gradient(135deg,#00cc88,#3d9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.comm-lbl{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+.comm-lbl{font-size:10px;color:var(--sub);font-weight:600;letter-spacing:.05em;margin-top:4px;}
 .comm-desc{font-size:11px;color:var(--sub);line-height:1.6;}
-/* Deposit card */
 .dep-item{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:8px;}
 .dep-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
-.dep-name{font-weight:800;font-size:13px;}.dep-amt{font-size:1.1rem;font-weight:900;color:var(--ylw);}
+.dep-name{font-weight:800;font-size:13px;}
+.dep-amt{font-size:1.1rem;font-weight:900;color:var(--ylw);}
 .dep-row{font-size:11px;color:var(--sub);margin-bottom:3px;}
 .dep-txn{font-family:monospace;font-size:10px;color:rgba(255,255,255,.4);word-break:break-all;}
 .dep-actions{display:flex;gap:7px;margin-top:9px;}
-.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;}
+.dep-note{font-size:10px;color:var(--pk);background:rgba(244,63,94,.08);border-radius:6px;padding:4px 7px;margin-top:5px;}
+.dep-proc{font-size:9px;color:rgba(255,255,255,.25);margin-top:3px;}
+.status-pill{display:inline-flex;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;}
 .s-pending{background:rgba(245,184,0,.1);color:var(--ylw);border:1px solid rgba(245,184,0,.2);}
 .s-confirmed{background:rgba(0,204,136,.1);color:var(--grn);border:1px solid rgba(0,204,136,.2);}
 .s-rejected{background:rgba(244,63,94,.1);color:var(--pk);border:1px solid rgba(244,63,94,.2);}
-/* Members */
-.mem{display:flex;align-items:center;gap:10px;background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:11px 12px;margin-bottom:7px;}
-.mem-av{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#00cc88);display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:900;}
-.mem-inf{flex:1;min-width:0;}.mem-nm{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.mem-mt{font-size:10px;color:var(--sub);}
-.mem-bl{font-weight:800;font-size:.9rem;color:var(--grn);flex-shrink:0;}
-/* Ref link */
+.s-confirming{background:rgba(61,158,255,.1);color:var(--blu);border:1px solid rgba(61,158,255,.2);}
+.user-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:8px;}
+.user-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.u-av{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#00cc88);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;}
+.u-nm{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-mt{font-size:10px;color:var(--sub);}
+.u-bal{font-weight:800;font-size:.95rem;color:var(--grn);}
+.u-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.u-stat{background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:8px;padding:6px;text-align:center;}
+.u-sv{font-size:.9rem;font-weight:900;line-height:1;}
+.u-sl{font-size:9px;color:var(--sub);margin-top:2px;}
 .ref-card{background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(0,204,136,.09));border:1px solid rgba(124,58,237,.28);border-radius:16px;padding:14px 15px;margin-bottom:10px;}
 .ref-lbl{font-size:11px;color:var(--sub);font-weight:600;margin-bottom:6px;}
 .ref-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;margin-bottom:10px;}
 .ref-url{flex:1;font-size:12px;color:#a78bfa;word-break:break-all;line-height:1.5;}
 .copy-btn{flex-shrink:0;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);color:#a78bfa;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:.15s;}
 .copy-btn:active{transform:scale(.92);}
+.pg-btns{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+.empty{display:flex;flex-direction:column;align-items:center;padding:30px 16px;gap:8px;text-align:center;}
+.ei{font-size:2.2rem;opacity:.5;}.et{font-size:13px;color:var(--sub);line-height:1.6;}
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:rgba(12,12,22,.96);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 20px;font-size:13px;font-weight:700;z-index:9999;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .25s;backdrop-filter:blur(20px);white-space:pre-line;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;opacity:0;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.t-ok{border-color:rgba(0,204,136,.4);color:#00cc88;}.t-err{border-color:rgba(244,63,94,.4);color:#f87171;}.t-info{border-color:rgba(61,158,255,.4);color:#3d9eff;}
 </style>
 </head>
 <body>
 <div class="amb"></div>
 <div id="ldr"><div class="ldr-icon">💣</div><div class="ldr-title">Agent Panel</div><div class="ring"></div></div>
-<div id="errSc"><div class="es-icon">🚫</div><div class="es-title" id="esTitle">Agent မဟုတ်ပါ</div><div class="es-sub" id="esSub">Admin ကို ဆက်သွယ်ပြီး Agent ခွင့်ပြုချက် ရယူပါ</div></div>
+<div id="errSc">
+  <div style="font-size:3.5rem">🚫</div>
+  <div style="font-size:1.15rem;font-weight:800;" id="esTitle">Agent မဟုတ်ပါ</div>
+  <div style="font-size:13px;color:var(--sub);max-width:270px;line-height:1.7;" id="esSub">Admin ကို ဆက်သွယ်ပြီး Agent ခွင့်ပြုချက် ရယူပါ</div>
+</div>
 
 <div id="shell">
+  <!-- Header -->
   <div class="hdr">
     <div class="hdr-av" id="hdrAv">🎯</div>
-    <div class="hdr-info">
+    <div style="flex:1;min-width:0;">
       <div class="hdr-name" id="hdrName">Agent</div>
       <div class="hdr-role">💣 MINES AGENT</div>
     </div>
-    <div class="hdr-bal">
+    <div>
       <div class="hdr-bal-amt" id="hdrBal">0</div>
-      <div class="hdr-bal-lbl">MMK</div>
+      <div class="hdr-bal-lbl">MMK Balance</div>
     </div>
   </div>
+  <!-- Stats bar -->
   <div class="sbar">
-    <div class="sb-it"><div class="sb-val" id="sbRef">0</div><div class="sb-lbl">Referrals</div></div>
+    <div class="sb-it"><div class="sb-val" id="sbRef">0</div><div class="sb-lbl">Members</div></div>
     <div class="sb-it"><div class="sb-val" id="sbSales">0</div><div class="sb-lbl">Sales(K)</div></div>
     <div class="sb-it"><div class="sb-val" id="sbTurnover">0</div><div class="sb-lbl">Turnover(K)</div></div>
     <div class="sb-it"><div class="sb-val" id="sbEarned">0</div><div class="sb-lbl">Earned(K)</div></div>
   </div>
+
   <div class="pages">
-    <!-- HOME -->
+
+    <!-- ══ HOME ══ -->
     <div class="page active" id="pg-home">
+      <!-- Ref Link -->
       <div class="ref-card">
-        <div class="ref-lbl">🔗 Referral Link</div>
+        <div class="ref-lbl">🔗 သင့် Referral Link</div>
         <div class="ref-box">
           <div class="ref-url" id="refUrl">Loading...</div>
           <button class="copy-btn" onclick="copyRef()">Copy</button>
         </div>
         <button class="btn btn-pur btn-f" onclick="shareRef()">📤 Link မျှဝေပါ</button>
       </div>
-      <!-- Commission Rates -->
+
+      <!-- Commission -->
       <div class="sec"><div class="sec-t">📊 Commission Rates</div></div>
       <div class="comm-card">
         <div class="comm-row">
@@ -142,10 +167,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);displa
           </div>
         </div>
         <div class="comm-desc">
-          💵 <b>Deposit Commission</b> — Referral User တစ်ယောက် ငွေဖြည့်တိုင်း သတ်မှတ်ထားသော % ကို ရရှိမည်<br><br>
-          🎮 <b>Turnover Commission</b> — Referral User ဂိမ်းဆော့တိုင်း Bet Amount ၏ % ကို ရရှိမည်
+          💵 <b>Deposit Commission</b> — Member ငွေဖြည့်တိုင်း % ရမည်<br><br>
+          🎮 <b>Turnover Commission</b> — Member ဂိမ်းဆော့တိုင်း Bet ၏ % ရမည်
         </div>
       </div>
+
+      <!-- Total Earned -->
       <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
         <div>
           <div style="font-size:11px;color:var(--sub);">Total Commission Earned</div>
@@ -153,61 +180,79 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);displa
         </div>
         <button class="btn btn-pur btn-sm" onclick="refreshAll()">🔄 Refresh</button>
       </div>
-    </div>
-    <!-- DEPOSITS -->
-    <div class="page" id="pg-dep">
-      <div class="sec">
-        <div class="sec-t">💰 Referral Deposits</div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-gh btn-sm" onclick="loadDeps('pending')" id="dTabPend">Pending</button>
-          <button class="btn btn-gh btn-sm" onclick="loadDeps('confirmed')" id="dTabConf">Confirmed</button>
+
+      <!-- Payment Info -->
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px;">💳 Member များ ငွေလွှဲမည့် Account</div>
+        <div id="kpayInfo" style="font-size:13px;line-height:2.2;">Loading...</div>
+        <div style="font-size:11px;color:rgba(255,184,0,.7);margin-top:8px;border-top:1px solid var(--bdr);padding-top:8px;">
+          ⚠️ Member တစ်ယောက် ငွေဖြည့်ပါက ဤ Account သို့ ငွေလွှဲမည်<br>Admin မှ ပြင်ဆင်နိုင်သည်
         </div>
       </div>
-      <div id="depList"><div class="empty"><div class="ei">💰</div><div class="et">Loading...</div></div></div>
     </div>
-    <!-- MEMBERS -->
-    <div class="page" id="pg-mem">
+
+    <!-- ══ DEPOSITS ══ -->
+    <div class="page" id="pg-dep">
       <div class="sec">
-        <div class="sec-t">👥 Members</div>
-        <button class="btn btn-gh btn-sm" onclick="loadMems(true)">🔄</button>
+        <div class="sec-t">💰 Member Deposits</div>
+        <button class="btn btn-gh btn-sm" onclick="loadDeps()">🔄</button>
       </div>
-      <div id="memList"><div class="empty"><div class="ei">👥</div><div class="et">Loading...</div></div></div>
+      <!-- Filter tabs -->
+      <div class="ftabs">
+        <div class="ftab on-p" id="dTab-pending"   onclick="setDepTab('pending')">⏳ Pending</div>
+        <div class="ftab"      id="dTab-confirmed" onclick="setDepTab('confirmed')">✅ Confirmed</div>
+        <div class="ftab"      id="dTab-rejected"  onclick="setDepTab('rejected')">❌ Rejected</div>
+      </div>
+      <div id="depList"><div class="empty"><div class="ei">💰</div><div class="et">Loading...</div></div></div>
+      <div class="pg-btns" id="depPg"></div>
     </div>
-    <!-- SETTINGS -->
+
+    <!-- ══ USERS ══ -->
+    <div class="page" id="pg-users">
+      <div class="sec">
+        <div class="sec-t">👥 Members <span id="memCount" style="font-size:11px;color:var(--sub);font-weight:500;"></span></div>
+        <button class="btn btn-gh btn-sm" onclick="loadUsers()">🔄</button>
+      </div>
+      <div id="userList"><div class="empty"><div class="ei">👥</div><div class="et">Loading...</div></div></div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
     <div class="page" id="pg-set">
       <div class="sec"><div class="sec-t">⚙️ Settings</div></div>
       <div class="card">
-        <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--sub);">📊 Commission Info</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--sub);">📊 Commission Rates</div>
         <div style="background:rgba(0,0,0,.25);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:12px;color:var(--sub);">Deposit Commission</span>
             <span style="font-weight:900;color:var(--ylw);" id="setDepComm">0%</span>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;justify-content:space-between;">
             <span style="font-size:12px;color:var(--sub);">Turnover Commission</span>
             <span style="font-weight:900;color:var(--grn);" id="setTurComm">0%</span>
           </div>
         </div>
         <div style="font-size:11px;color:var(--sub);line-height:1.7;background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:10px;padding:10px;">
-          Commission Rate ကို Admin မှ သာ ပြင်ဆင်နိုင်သည်။<br>
-          Rate ပြောင်းလဲမှုများ Admin ကို ဆက်သွယ်ပါ။
+          Rate ပြောင်းရန် Admin ကို ဆက်သွယ်ပါ
         </div>
       </div>
       <div class="card">
         <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--sub);">👤 Account Info</div>
-        <div style="font-size:12px;color:var(--sub);line-height:2;">
-          <div>ID: <b style="color:var(--tx);" id="setId">—</b></div>
+        <div style="font-size:12px;color:var(--sub);line-height:2.2;">
+          <div>Telegram ID: <b style="color:var(--tx);" id="setId">—</b></div>
           <div>Username: <b style="color:var(--tx);" id="setUser">—</b></div>
           <div>Referral Code: <b style="color:#a78bfa;" id="setCode">—</b></div>
+          <div>Balance: <b style="color:var(--grn);" id="setBal">—</b></div>
         </div>
       </div>
     </div>
+
   </div>
+
   <nav class="bnav">
-    <button class="bn on" data-p="home" onclick="nav('home')"><div class="bn-ic">🏠</div><div class="bn-lb">Home</div><div class="bn-dot"></div></button>
-    <button class="bn" data-p="dep" onclick="nav('dep')"><div class="bn-ic">💰</div><div class="bn-lb">Deposits</div><div class="bn-dot"></div><div class="bn-badge" id="depBadge"></div></button>
-    <button class="bn" data-p="mem" onclick="nav('mem')"><div class="bn-ic">👥</div><div class="bn-lb">Members</div><div class="bn-dot"></div></button>
-    <button class="bn" data-p="set" onclick="nav('set')"><div class="bn-ic">⚙️</div><div class="bn-lb">Settings</div><div class="bn-dot"></div></button>
+    <button class="bn on" data-p="home"  onclick="nav('home')"><div class="bn-ic">🏠</div><div class="bn-lb">Home</div><div class="bn-dot"></div></button>
+    <button class="bn"    data-p="dep"   onclick="nav('dep')"><div class="bn-ic">💰</div><div class="bn-lb">Deposits</div><div class="bn-dot"></div><div class="bn-badge" id="depBadge"></div></button>
+    <button class="bn"    data-p="users" onclick="nav('users')"><div class="bn-ic">👥</div><div class="bn-lb">Members</div><div class="bn-dot"></div></button>
+    <button class="bn"    data-p="set"   onclick="nav('set')"><div class="bn-ic">⚙️</div><div class="bn-lb">Settings</div><div class="bn-dot"></div></button>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -220,177 +265,286 @@ const BOT = 'winnermine_bot';
 let G = { telegramId: null, data: null };
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function K(n){ return Math.round((n||0)/1000); }
+function Km(n){ return Math.round((n||0)/1000); }
+function fmtDate(d){ if(!d) return '—'; const dt=new Date(d); return `${dt.getDate()}/${dt.getMonth()+1} ${dt.getHours().toString().padStart(2,'0')}:${dt.getMinutes().toString().padStart(2,'0')}`; }
+function init1(n){ return ((n||'?')[0]||'?').toUpperCase(); }
+
 function toast(msg, type='ok', dur=2800){
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.className = `toast t-${type}`;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), dur);
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast t-${type}`;
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur);
 }
-function busy(btn, bsp, on){
-  document.getElementById(btn).disabled = on;
-  document.getElementById(bsp).style.display = on ? 'block' : 'none';
-}
-function myerr(msg){ if(msg && msg.includes('Agent')) return '🚫 Agent ခွင့်ပြုချက် မရရှိသေးပါ'; return msg||'Error'; }
-function init1(name){ return ((name||'?')[0]||'?').toUpperCase(); }
+function myerr(msg){ if(msg&&(msg.includes('Agent')||msg.includes('မဟုတ်'))) return '🚫 Agent ခွင့်ပြုချက် မရရှိသေးပါ'; return msg||'Error'; }
 
 async function api(path, method='GET', body=null){
-  const opts = { method, headers: { 'Content-Type':'application/json', 'x-telegram-id': String(G.telegramId||'') } };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(API + path, opts);
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error || 'Request failed');
+  const opts={ method, headers:{'Content-Type':'application/json','x-telegram-id':String(G.telegramId||'')} };
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API+path, opts);
+  const d=await r.json();
+  if(!r.ok) throw new Error(d.error||'Request failed');
   return d;
 }
 
+// ── Navigation ───────────────────────────────────────────────────────────────
 function nav(pg){
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.bn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+pg).classList.add('active');
   document.querySelector(`.bn[data-p="${pg}"]`).classList.add('on');
-  if (pg === 'dep')  loadDeps('pending');
-  if (pg === 'mem')  loadMems();
-  if (pg === 'set')  renderSettings();
+  if(pg==='dep')   loadDeps();
+  if(pg==='users') loadUsers();
+  if(pg==='set')   renderSettings();
 }
 
+// ── Stats / Header update ────────────────────────────────────────────────────
 function updateStats(){
-  const d = G.data;
-  if (!d) return;
-  document.getElementById('hdrName').textContent = d.firstName || d.username || 'Agent';
-  document.getElementById('hdrAv').textContent = init1(d.firstName||d.username);
-  document.getElementById('hdrBal').textContent = (d.balance||0).toLocaleString();
-  document.getElementById('sbRef').textContent = d.totalReferrals||0;
-  document.getElementById('sbSales').textContent = K(d.totalSales);
-  document.getElementById('sbTurnover').textContent = K(d.totalTurnover||0);
-  document.getElementById('sbEarned').textContent = K(d.totalCommissionEarned||0);
+  const d=G.data; if(!d) return;
+  document.getElementById('hdrName').textContent    = d.firstName||d.username||'Agent';
+  document.getElementById('hdrAv').textContent      = init1(d.firstName||d.username);
+  document.getElementById('hdrBal').textContent     = (d.balance||0).toLocaleString();
+  document.getElementById('sbRef').textContent      = d.totalReferrals||0;
+  document.getElementById('sbSales').textContent    = Km(d.totalSales);
+  document.getElementById('sbTurnover').textContent = Km(d.totalTurnover||0);
+  document.getElementById('sbEarned').textContent   = Km(d.totalCommissionEarned||0);
   document.getElementById('depCommPct').textContent = `${d.depositCommission||0}%`;
   document.getElementById('turCommPct').textContent = `${d.turnoverCommission||0}%`;
-  document.getElementById('totalEarned').textContent = `${(d.totalCommissionEarned||0).toLocaleString()} MMK`;
-  const refLink = `https://t.me/${d.botUsername||BOT}?start=${d.referralCode||''}`;
-  document.getElementById('refUrl').textContent = refLink;
-  document.getElementById('refUrl').dataset.link = refLink;
-}
-function renderSettings(){
-  const d = G.data;
-  if (!d) return;
-  document.getElementById('setDepComm').textContent = `${d.depositCommission||0}%`;
-  document.getElementById('setTurComm').textContent = `${d.turnoverCommission||0}%`;
-  document.getElementById('setId').textContent = d.telegramId||'—';
-  document.getElementById('setUser').textContent = '@'+(d.username||'—');
-  document.getElementById('setCode').textContent = d.referralCode||'—';
-}
-function copyRef(){
-  const link = document.getElementById('refUrl').dataset.link || document.getElementById('refUrl').textContent;
-  navigator.clipboard?.writeText(link);
-  toast('🔗 Link ကူးယူပြီး!', 'ok');
-}
-function shareRef(){
-  const link = document.getElementById('refUrl').dataset.link || document.getElementById('refUrl').textContent;
-  const text = `💣 Mines Game ကစားပြီးငွေရှာကြစို့!\n📈 ဗုံးများလေ Multiplier မြင့်လာလေ!\n🚀 မြန်ဆန်တဲ့ ငွေထုတ်စနစ်\nJoin ပါ 👇`;
-  const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
-  if (tg?.openTelegramLink) tg.openTelegramLink(url);
-  else window.open(url, '_blank');
+  document.getElementById('totalEarned').textContent= `${(d.totalCommissionEarned||0).toLocaleString()} MMK`;
+  const link = `https://t.me/${d.botUsername||BOT}?start=${d.referralCode||''}`;
+  document.getElementById('refUrl').textContent  = link;
+  document.getElementById('refUrl').dataset.link = link;
+  renderKpayInfo(d);
 }
 
-/* ══ DEPOSITS ══ */
-let dCurrent = 'pending';
-async function loadDeps(status='pending'){
-  dCurrent = status;
-  document.getElementById('dTabPend').className = 'btn btn-sm ' + (status==='pending'?'btn-pur':'btn-gh');
-  document.getElementById('dTabConf').className = 'btn btn-sm ' + (status==='confirmed'?'btn-grn':'btn-gh');
-  const el = document.getElementById('depList');
-  el.innerHTML = `<div class="empty"><div class="ei">💰</div><div class="et">Loading...</div></div>`;
+function renderKpayInfo(d){
+  const el=document.getElementById('kpayInfo');
+  if(!d.agentKpayNumber){
+    el.innerHTML='<span style="color:var(--pk);font-size:12px;">⚠️ Admin မှ KPay Info မသတ်မှတ်ရသေးပါ<br>Admin ကို ဆက်သွယ်ပါ</span>';
+    return;
+  }
+  let html=`<div>📱 <b style="color:var(--tx);">${esc(d.agentKpayNumber)}</b> <span style="color:var(--sub);font-size:11px;">(KPay)</span></div>`;
+  html+=`<div>👤 <b style="color:var(--tx);">${esc(d.agentKpayName||'—')}</b> <span style="color:var(--sub);font-size:11px;">(KPay Name)</span></div>`;
+  if(d.hasWave && d.agentWaveNumber){
+    html+=`<div>🌊 <b style="color:#00e5cc;">${esc(d.agentWaveNumber)}</b> <span style="color:var(--sub);font-size:11px;">(Wave Pay)</span></div>`;
+    html+=`<div>👤 <b style="color:#00e5cc;">${esc(d.agentWaveName||'—')}</b> <span style="color:var(--sub);font-size:11px;">(Wave Name)</span></div>`;
+  }
+  el.innerHTML=html;
+}
+
+function renderSettings(){
+  const d=G.data; if(!d) return;
+  document.getElementById('setDepComm').textContent= `${d.depositCommission||0}%`;
+  document.getElementById('setTurComm').textContent= `${d.turnoverCommission||0}%`;
+  document.getElementById('setId').textContent     = d.telegramId||'—';
+  document.getElementById('setUser').textContent   = '@'+(d.username||'—');
+  document.getElementById('setCode').textContent   = d.referralCode||'—';
+  document.getElementById('setBal').textContent    = `${(d.balance||0).toLocaleString()} MMK`;
+}
+
+function copyRef(){
+  const link=document.getElementById('refUrl').dataset.link||document.getElementById('refUrl').textContent;
+  navigator.clipboard?.writeText(link);
+  toast('🔗 Link ကူးယူပြီး!','ok');
+}
+function shareRef(){
+  const link=document.getElementById('refUrl').dataset.link||document.getElementById('refUrl').textContent;
+  const text=`💣 Mines Game ကစားပြီးငွေရှာကြစို့!\n📈 ဗုံးများလေ Multiplier မြင့်လာလေ!\n🚀 မြန်ဆန်တဲ့ ငွေထုတ်စနစ်\nJoin ပါ 👇`;
+  const url=`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
+  if(tg?.openTelegramLink) tg.openTelegramLink(url);
+  else window.open(url,'_blank');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DEPOSITS — Pending / Confirmed / Rejected + pagination
+// ════════════════════════════════════════════════════════════════════════════
+let depStatus='pending', depPage=1;
+
+function setDepTab(status){
+  depStatus=status; depPage=1;
+  ['pending','confirmed','rejected'].forEach(s=>{
+    const t=document.getElementById(`dTab-${s}`);
+    t.className='ftab'+(s===status ? (s==='pending'?' on-p':s==='confirmed'?' on-c':' on-r'):'');
+  });
+  loadDeps();
+}
+
+async function loadDeps(){
+  const el=document.getElementById('depList');
+  el.innerHTML=`<div class="empty"><div class="ei">💰</div><div class="et">Loading...</div></div>`;
   try{
-    const deps = await api(`/api/agent/deposits?status=${status}`);
-    if (!deps.length){
-      el.innerHTML = `<div class="empty"><div class="ei">💰</div><div class="et">${status==='pending'?'Pending Deposit မရှိပါ':'Confirmed Deposit မရှိပါ'}</div></div>`;
+    // ✅ Backend returns { deposits:[...], total, pages }
+    const res = await api(`/api/agent/deposits?status=${depStatus}&page=${depPage}`);
+    const deps = Array.isArray(res) ? res : (res.deposits || []);
+    const pages= res.pages || 1;
+    const total= res.total || deps.length;
+
+    // Update pending badge
+    if(depStatus==='pending'){
+      const badge=document.getElementById('depBadge');
+      if(total>0){ badge.textContent=total; badge.classList.add('on'); }
+      else badge.classList.remove('on');
+    }
+
+    if(!deps.length){
+      const labels={pending:'Pending Deposit မရှိပါ',confirmed:'Confirmed Deposit မရှိပါ',rejected:'Rejected Deposit မရှိပါ'};
+      el.innerHTML=`<div class="empty"><div class="ei">💰</div><div class="et">${labels[depStatus]}</div></div>`;
+      document.getElementById('depPg').innerHTML='';
       return;
     }
-    const badge = document.getElementById('depBadge');
-    if(status==='pending'){ badge.textContent=deps.length; badge.classList.add('on'); }
-    el.innerHTML = deps.map(d => `
-      <div class="dep-item" id="di-${d._id}">
-        <div class="dep-top">
-          <div><div class="dep-name">${esc(d.userName)}</div><div class="dep-row">${d.paymentMethod==='wave'?'🌊 Wave Pay':'📱 KPay'} • ${new Date(d.createdAt).toLocaleString()}</div><div class="dep-row">📝 ${esc(d.kpayName)}</div><div class="dep-txn">🔢 ${esc(d.transactionId)}</div></div>
-          <div><div class="dep-amt">${(d.amount||0).toLocaleString()}</div><div class="dep-row" style="text-align:right;">MMK</div><div class="status-pill s-${d.status}">${d.status}</div></div>
+
+    el.innerHTML=deps.map(d=>renderDepItem(d)).join('');
+    renderPagination('depPg', depPage, pages, p=>{ depPage=p; loadDeps(); });
+  }catch(e){
+    el.innerHTML=`<div class="empty"><div class="ei">❌</div><div class="et">${esc(myerr(e.message))}</div></div>`;
+  }
+}
+
+function renderDepItem(d){
+  const isPending=(d.status==='pending');
+  const proc=d.processedAt?`<div class="dep-proc">✅ ${fmtDate(d.processedAt)}</div>`:'';
+  const note=d.rejectionNote?`<div class="dep-note">❌ ${esc(d.rejectionNote)}</div>`:'';
+  return `
+  <div class="dep-item" id="di-${d._id}">
+    <div class="dep-top">
+      <div style="flex:1;min-width:0;">
+        <div class="dep-name">${esc(d.userName)}</div>
+        <div class="dep-row">${d.paymentMethod==='wave'?'🌊 Wave':'📱 KPay'} • ${fmtDate(d.createdAt)}</div>
+        <div class="dep-row">📝 ${esc(d.kpayName)}</div>
+        <div class="dep-txn">🔢 ${esc(d.transactionId)}</div>
+        ${proc}
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="dep-amt">${(d.amount||0).toLocaleString()}</div>
+        <div class="dep-row">MMK</div>
+        <div class="status-pill s-${d.status}">${d.status}</div>
+      </div>
+    </div>
+    ${note}
+    ${isPending?`<div class="dep-actions">
+      <button class="btn btn-grn btn-sm" onclick="confirmDep('${d._id}')">✅ Confirm</button>
+      <button class="btn btn-red btn-sm" onclick="rejectDep('${d._id}')">❌ Reject</button>
+    </div>`:''}
+  </div>`;
+}
+
+async function confirmDep(id){
+  if(!confirm('Deposit ကို Confirm လုပ်မည်?\n(သင့် Balance မှ ဖြတ်မည်)')) return;
+  try{
+    await api(`/api/agent/deposits/${id}/confirm`,'POST');
+    toast('✅ Deposit Confirmed!\nMember Balance ဖြည့်ပြီ','ok',3500);
+    loadDeps();
+    G.data=await api('/api/agent/panel');
+    updateStats();
+  }catch(e){
+    if(e.message.includes('မလောက်')||e.message.toLowerCase().includes('insufficient'))
+      toast('💸 သင့် Balance မလုံလောက်ပါ\nAdmin ကို Unit ဖြည့်ပါ','err',5000);
+    else toast(myerr(e.message),'err');
+  }
+}
+async function rejectDep(id){
+  const reason=prompt('ပယ်ချရသည့် အကြောင်းပြချက် (optional):')||'';
+  try{
+    await api(`/api/agent/deposits/${id}/reject`,'POST',{reason});
+    toast('❌ Deposit Rejected','info');
+    loadDeps();
+  }catch(e){ toast(myerr(e.message),'err'); }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// USERS / MEMBERS — with deposit stats per user
+// ════════════════════════════════════════════════════════════════════════════
+async function loadUsers(){
+  const el=document.getElementById('userList');
+  el.innerHTML=`<div class="empty"><div class="ei">👥</div><div class="et">Loading...</div></div>`;
+  try{
+    // Load referrals + pending deposits together
+    const [refData, pendingRes] = await Promise.all([
+      api('/api/agent/referrals'),
+      api('/api/agent/deposits?status=pending&page=1').catch(()=>({deposits:[]}))
+    ]);
+    const refs   = refData.referrals||[];
+    const pending= (Array.isArray(pendingRes)?pendingRes:(pendingRes.deposits||[]));
+
+    document.getElementById('memCount').textContent = refs.length ? `(${refs.length})` : '';
+
+    if(!refs.length){
+      el.innerHTML=`<div class="empty"><div class="ei">👥</div><div class="et">Member မရှိသေးပါ<br><small style="opacity:.6;">Referral Link မျှဝေပါ</small></div></div>`;
+      return;
+    }
+
+    // Map pending counts by user
+    const pendMap={};
+    pending.forEach(d=>{ pendMap[String(d.userId)]=(pendMap[String(d.userId)]||0)+1; });
+
+    el.innerHTML=refs.map(u=>`
+      <div class="user-card">
+        <div class="user-top">
+          <div class="u-av">${init1(u.name)}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="u-nm">${esc(u.name)}</div>
+            <div class="u-mt">@${esc(u.username||'—')} • Join: ${fmtDate(u.joinedAt)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="u-bal">${(u.balance||0).toLocaleString()}</div>
+            <div style="font-size:9px;color:var(--sub);">MMK</div>
+          </div>
         </div>
-        ${d.status==='pending'?`<div class="dep-actions"><button class="btn btn-grn btn-sm" onclick="confirmDep('${d._id}')">✅ Confirm</button><button class="btn btn-red btn-sm" onclick="rejectDep('${d._id}')">❌ Reject</button></div>`:''}
+        <div class="u-stats">
+          <div class="u-stat">
+            <div class="u-sv" style="color:var(--ylw);">${(u.totalDeposited||0).toLocaleString()}</div>
+            <div class="u-sl">Deposited</div>
+          </div>
+          <div class="u-stat">
+            <div class="u-sv" style="color:var(--grn);">${u.depositCount||0}</div>
+            <div class="u-sl">Times</div>
+          </div>
+          <div class="u-stat" style="${pendMap[String(u.telegramId)]?'background:rgba(245,184,0,.1);border-color:rgba(245,184,0,.3);':''}">
+            <div class="u-sv" style="color:${pendMap[String(u.telegramId)]?'var(--ylw)':'var(--sub)'};">${pendMap[String(u.telegramId)]||0}</div>
+            <div class="u-sl">⏳ Pending</div>
+          </div>
+        </div>
       </div>`).join('');
   }catch(e){
     el.innerHTML=`<div class="empty"><div class="ei">❌</div><div class="et">${esc(myerr(e.message))}</div></div>`;
   }
 }
-async function confirmDep(id){
-  if(!confirm('Deposit ကို Confirm မလုပ်ချင်သေးပါ?')) return;
-  try{
-    await api(`/api/agent/deposits/${id}/confirm`,'POST');
-    toast('✅ Deposit Confirmed!','ok');
-    loadDeps(dCurrent);
-    G.data = await api('/api/agent/panel'); updateStats();
-    document.getElementById('depBadge').classList.remove('on');
-  }catch(e){
-    if(e.message.includes('မလောက်')||e.message.includes('insufficient')||e.message.includes('Insufficient'))
-      toast('💸 သင့် Balance မလုံလောက်ပါ\nAdmin ကို ဆက်သွယ်ပြီး Unit ဖြည့်ပါ','err',5000);
-    else toast(myerr(e.message),'err');
-  }
-}
-async function rejectDep(id){
-  const reason = prompt('ပယ်ချရသည့် အကြောင်းပြချက် (optional):')||'';
-  try{
-    await api(`/api/agent/deposits/${id}/reject`,'POST',{reason});
-    toast('❌ Deposit Rejected','info');
-    loadDeps(dCurrent);
-  }catch(e){ toast(myerr(e.message),'err'); }
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+function renderPagination(id, cur, total, cb){
+  const el=document.getElementById(id); el.innerHTML='';
+  if(total<=1) return;
+  if(cur>1){const b=document.createElement('button');b.className='btn btn-gh btn-sm';b.textContent='← Prev';b.onclick=()=>cb(cur-1);el.appendChild(b);}
+  const sp=document.createElement('span');sp.style.cssText='color:var(--sub);font-size:12px;padding:0 8px;';sp.textContent=`${cur}/${total}`;el.appendChild(sp);
+  if(cur<total){const b=document.createElement('button');b.className='btn btn-gh btn-sm';b.textContent='Next →';b.onclick=()=>cb(cur+1);el.appendChild(b);}
 }
 
-/* ══ MEMBERS ══ */
-async function loadMems(showMsg=false){
-  const el = document.getElementById('memList');
-  el.innerHTML = `<div class="empty"><div class="ei">👥</div><div class="et">Loading...</div></div>`;
-  try{
-    const d = await api('/api/agent/referrals');
-    if(!d.referrals.length){
-      el.innerHTML = `<div class="empty"><div class="ei">👥</div><div class="et">Member မရှိသေးပါ<br><small style="opacity:.6;">Referral Link မျှဝေပါ</small></div></div>`;
-      return;
-    }
-    el.innerHTML = d.referrals.map(u => `
-      <div class="mem">
-        <div class="mem-av">${init1(u.name)}</div>
-        <div class="mem-inf">
-          <div class="mem-nm">${esc(u.name)}</div>
-          <div class="mem-mt">@${esc(u.username||'—')} • ${new Date(u.joinedAt).toLocaleDateString()}</div>
-        </div>
-        <div class="mem-bl">${(u.balance||0).toLocaleString()}</div>
-      </div>`).join('');
-    if(showMsg) toast(`👥 ${d.total} ဦး ရှိသည်`,'info');
-  }catch(e){
-    el.innerHTML = `<div class="empty"><div class="ei">❌</div><div class="et">${esc(myerr(e.message))}</div></div>`;
-  }
-}
-
-/* ══ REFRESH ══ */
+// ── Refresh ────────────────────────────────────────────────────────────────────
 async function refreshAll(){
   try{
-    G.data = await api('/api/agent/panel');
+    G.data=await api('/api/agent/panel');
     updateStats(); renderSettings();
     toast('🔄 Refresh ပြီးပါပြီ','ok');
   }catch(e){ toast(myerr(e.message),'err'); }
 }
 
-/* ══ START ══ */
+// ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    let tid = null;
-    if (tg?.initDataUnsafe?.user?.id) tid = tg.initDataUnsafe.user.id;
-    else { const p = new URLSearchParams(location.search); tid = parseInt(p.get('devId')||p.get('telegramId')); }
-    if (!tid) throw new Error('Telegram ID မရပါ');
-    G.telegramId = tid;
-    G.data = await api('/api/agent/panel');
+  try{
+    let tid=null;
+    if(tg?.initDataUnsafe?.user?.id) tid=tg.initDataUnsafe.user.id;
+    else{ const p=new URLSearchParams(location.search); tid=parseInt(p.get('devId')||p.get('telegramId')); }
+    if(!tid) throw new Error('Telegram ID မရပါ');
+    G.telegramId=tid;
+    G.data=await api('/api/agent/panel');
     updateStats();
+    // Load pending badge count
+    api('/api/agent/deposits?status=pending&page=1').then(r=>{
+      const cnt=(r.total||(Array.isArray(r)?r.length:(r.deposits||[]).length));
+      if(cnt>0){ const b=document.getElementById('depBadge'); b.textContent=cnt; b.classList.add('on'); }
+    }).catch(()=>{});
     document.getElementById('ldr').style.opacity='0';
     setTimeout(()=>{ document.getElementById('ldr').style.display='none'; document.getElementById('shell').style.display='flex'; },300);
-  } catch(e) {
-    document.getElementById('esTitle').textContent = myerr(e.message);
+  }catch(e){
+    document.getElementById('esTitle').textContent=myerr(e.message);
     document.getElementById('ldr').style.display='none';
     document.getElementById('errSc').style.display='flex';
   }
