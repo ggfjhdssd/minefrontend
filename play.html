@@ -202,8 +202,8 @@ select.inp option{background:#1a1a2e;color:var(--tx);}
     <div class="setup-title">⚙️ Game Setup</div>
     <div class="row2">
       <div class="field">
-        <label>💰 လောင်းကြေး (MMK)</label>
-        <input id="betInput" class="inp" type="number" placeholder="1000" min="100" step="100">
+        <label>💰 ကစားမည့်ပမာဏ (MMK)</label>
+        <input id="betInput" class="inp" type="number" placeholder="1000" min="1000" step="100">
       </div>
       <div class="field">
         <label>💣 ဗုံးအရေအတွက်</label>
@@ -388,7 +388,7 @@ async function init(){
 async function startGame(){
   const bet = parseInt(document.getElementById('betInput').value);
   const bombs = parseInt(document.getElementById('bombSelect').value);
-  if (!bet || bet < 100)  { toast('Bet အနည်းဆုံး 100 MMK ဖြည့်ပါ', 'err'); return; }
+  if (!bet || bet < 1000) { toast('အနည်းဆုံး ၁,၀၀၀ ကျပ်မှ စတင်၍ ကစားနိုင်ပါသည်', 'err'); return; }
   if (!bombs)              { toast('ဗုံးအရေအတွက် ရွေးပါ', 'err'); return; }
   if (bet > G.balance)    { toast('လက်ကျန်ငွေ မလုံလောက်ပါ', 'err'); return; }
 
