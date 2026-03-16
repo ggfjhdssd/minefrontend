@@ -1,28 +1,20 @@
 {
   "version": 2,
   "outputDirectory": ".",
-  "builds": [
-    { "src": "*.html", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/play.html", "dest": "/play.html" },
-    { "src": "/admin.html", "dest": "/admin.html" },
-    { "src": "/agent.html", "dest": "/agent.html" },
-    { "src": "/play",  "dest": "/play.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/agent", "dest": "/agent.html" },
-    { "src": "/",      "dest": "/index.html" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/play", "destination": "/play.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/agent", "destination": "/agent.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options",              "value": "ALLOWALL"   },
-        { "key": "Access-Control-Allow-Origin",  "value": "*"          },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" }
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" },
+        { "key": "X-Frame-Options", "value": "ALLOWALL" }
       ]
     }
   ]
